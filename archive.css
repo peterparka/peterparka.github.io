@@ -10,164 +10,233 @@
     font-family: "BlenderProBook";
     src: url("type/BlenderProBook.otf");
 }
-body {
- margin-left: 3%; 
- margin-right: 3%;
- max-height: 2000px;
- margin: 0 auto;
+
+* {
+    box-sizing: border-box;
 }
-/*header*/
+
+body {
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Header */
 .head {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-left: 2%;
-    margin-right: 2%;
+    padding: 15px 3%;
+    align-items: center;
 }
+
 .name {
     text-decoration: none;
+    color: black;
 }
+
 .end a {
     text-decoration: none;
-    color:black;
+    color: black;
 }
+
 a:visited {
- color: black;
+    color: black;
 }
+
 .head h5 {
-    font-family: "MaisonMonoReg";
-    flex-grow: ;
-    color:black;
+    font-family: "MaisonMonoReg", monospace;
+    color: black;
+    margin: 0;
+    font-size: 14px;
 }
-.head a {
-    text-decoration: none;
-    color:black;
-}
+
 .blog a {
     text-decoration: none;
     border-bottom: 2px solid rgba(0, 0, 0, 0);
     padding-bottom: 15px;
     transition: .3s ease;
-    color:black;
+    color: black;
+    padding: 10px;
+    display: inline-block;
 }
+
 .blog a:hover {
     border-bottom: 2px solid rgba(0, 0, 0, 1);
     padding-bottom: 5px;
 }
-/*Container For Description*/
+
+/* Container For Description */
 .container {
     display: flex;
     flex-direction: column;
-    margin-left: 10%;
-    margin-right: 10%;
-    margin-top: 5%;
-    margin-bottom: 7%;
-    justify-content: space-around;
+    margin: 5% 10% 10%;
 }
-/*Descriptions*/
+
+/* Descriptions */
 .descript {
     display: flex; 
     flex-direction: row;
     align-items: baseline;
     justify-content: space-between;
     border-bottom: 3px solid black;
-    padding-bottom: 2px;
+    padding: 15px 0;
+    transition: background-color 0.2s ease;
 }
+
 .descript:hover {
     background-color: #FF5335;
 }
+
 .descript h3 {
-    font-family: "BlenderProBold";
+    font-family: "BlenderProBold", sans-serif;
     font-size: 21px;
-    margin-left: 15%;
-    
+    margin: 0 0 0 15%;
 }
+
 .descript p {
-    font-family: "BlenderProBook";
+    font-family: "BlenderProBook", sans-serif;
     font-size: 12px;
-    margin-right: 15%;
+    margin: 0 15% 0 0;
+    text-align: right;
 }
+
 .descript a {
     text-decoration: none;
-    color:black;
+    color: black;
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px;
 }
-/*footer*/
-/*footer*/
+
+/* Footer */
 footer {
     background-color: white;
     position: fixed;
     height: 35px;
     bottom: 0;
+    left: 0;
     z-index: 10;
     border-top: 1px solid #F2F2F2;
-    width: 100%; 
-    
+    width: 100%;
 }
+
 .footer-links {
-  font-family: "MaisonMonoReg";
-  font-size: 10px;    
-  margin-top: 11px;
-  margin-right: 3%;
-  text-align: right;   
+    font-family: "MaisonMonoReg", monospace;
+    font-size: 10px;    
+    margin: 11px 3% 0;
+    text-align: right;
 }
-.foot-1 {
-    text-decoration:none;
-    color:black;
+
+.foot-1, .foot-2, .foot-3 {
+    text-decoration: none;
+    color: black;
+    padding: 10px;
+    display: inline-block;
 }
-.foot-1:hover {
+
+.foot-1:hover, .foot-2:hover, .foot-3:hover {
     color: #FF5335;
 }
 
-.foot-2 {
-    text-decoration:none;
-    color:black;
-}
-.foot-2:hover {
-    color: #FF5335;
+/* TABLET STYLES (601px - 1024px) */
+@media screen and (max-width: 1024px) {
+    .container {
+        margin: 5% 5% 10%;
+    }
+    
+    .descript h3 {
+        margin-left: 10%;
+        font-size: 20px;
+    }
+    
+    .descript p {
+        margin-right: 10%;
+    }
 }
 
-.foot-3 {
-    text-decoration:none;
-    color:black;
-}
-.foot-3:hover {
-    color: #FF5335;
-}
-
-@media screen and (min-width: 375px) and (max-width: 667px) {
+/* MOBILE STYLES (up to 600px) */
+@media screen and (max-width: 600px) {
+    /* Header */
     .head {
-        display: flex;
         flex-direction: column;
         align-items: center;
+        gap: 10px;
+        padding: 20px 3%;
     }
-    .descript {
-    display: flex; 
-    flex-direction: row;
-    align-items: baseline;
-    justify-content:space-between;
-    border-bottom: 3px solid black;
-    padding-bottom: 2px;
-}
-    .container {
-    display: flex;
-    flex-direction: column;
-    margin-left: ;
-    margin-right: ;
-    margin-top: 5%;
-    margin-bottom: 7%;
-    justify-content: ;
-}
-    .descript h3 {
-    font-family: BlenderProBold;
-    font-size: 21px;
-    margin-left: 5%;
-}
-.descript p {
-    font-family: BlenderProBook;
-    font-size: 12px;
-    margin-right: 5%;
-}
-
     
+    .head h5 {
+        font-size: 12px;
+        text-align: center;
+    }
+    
+    .blog {
+        margin-top: 10px;
+    }
+    
+    /* Container */
+    .container {
+        margin: 5% 3% 15%;
+    }
+    
+    /* Descriptions */
+    .descript {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px 5%;
+        gap: 10px;
+    }
+    
+    .descript a {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .descript h3 {
+        font-family: "BlenderProBold", sans-serif;
+        font-size: 18px;
+        margin: 0;
+        line-height: 1.4em;
+    }
+    
+    .descript p {
+        font-family: "BlenderProBook", sans-serif;
+        font-size: 12px;
+        margin: 5px 0 0 0;
+        text-align: left;
+        color: #666;
+    }
+    
+    /* Footer */
+    footer {
+        height: 45px;
+    }
+    
+    .footer-links {
+        font-size: 12px;
+        margin-top: 15px;
+    }
+    
+    .foot-1, .foot-2, .foot-3 {
+        padding: 12px;
+    }
+}
 
+/* SMALL MOBILE (up to 375px) */
+@media screen and (max-width: 375px) {
+    .head h5 {
+        font-size: 10px;
+    }
+    
+    .descript h3 {
+        font-size: 16px;
+    }
+    
+    .descript p {
+        font-size: 11px;
+    }
 }
