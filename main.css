@@ -15,6 +15,14 @@
     box-sizing: border-box;
 }
 
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+img {
+    max-width: 100%;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -77,7 +85,7 @@ a:visited {
 
 /* Side Nav */
 .side {
-    margin-top: 100px;
+    /*margin-top: 100px;*/
     margin-left: 3%;
     width: 25%;
     position: fixed;
@@ -114,15 +122,12 @@ a:visited {
     color: #FF5335;
 }
 
-.links {
-    margin-top: 25%;
-}
 
 /* Main */
 .main {
     display: flex;
     flex-direction: column;
-    margin-top: 120px;
+    margin-top: 60px;
     padding-bottom: 60px;
 }
 
@@ -131,8 +136,8 @@ a:visited {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     width: 55%;
     margin-left: 42%;
-    margin-top: 5%;
-    margin-bottom: 5%;
+    margin-top: 4%;
+    margin-bottom: 8%;
 }
 
 .image {
@@ -172,7 +177,7 @@ a:visited {
 
 .project h3 {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-weight: 700;
+    font-weight: 600;
     text-align: center;
     font-size: 28px;
     letter-spacing: 1px;
@@ -181,18 +186,18 @@ a:visited {
 }
 
 .p1 {
-    border-bottom: 3px solid black;
-    padding: 1%;
+    /*border-bottom: 3px solid black;*/
+    /*padding: 1%;*/
 }
 
 .project h4 {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-weight: 400;
-    font-size: 16px;
+    font-size: 15px;
     text-align: center;
     letter-spacing: 1px;
     text-decoration: none;
-    color: black;
+    color: #696868;
     margin: 0;
 }
 
@@ -383,174 +388,246 @@ footer {
     75% { transform: translate(35px, -60px); }
 }
 
-/* TABLET STYLES (601px - 1024px) */
+/* RESPONSIVE BREAKPOINTS */
+/* Large tablet / small laptop */
 @media screen and (max-width: 1024px) {
-    .side {
-        width: 30%;
+    .head {
+        padding-left: 4%;
+        padding-right: 4%;
     }
-    
+
+    .side {
+        width: 31%;
+        margin-left: 4%;
+        max-width: 280px;
+    }
+
     .project {
-        width: 60%;
+        width: 58%;
         margin-left: 38%;
     }
-    
+
+    .project h3 {
+        font-size: clamp(22px, 3vw, 28px);
+    }
+
+    .project h4 {
+        font-size: clamp(14px, 1.8vw, 16px);
+    }
+
     .pop h1 {
-        font-size: 36px;
-        width: 85%;
+        width: 86%;
+        font-size: clamp(30px, 4.4vw, 36px);
     }
 }
 
-/* MOBILE STYLES (up to 600px) */
-@media screen and (max-width: 600px) {
-    /* Header */
+/* Tablet: switch from fixed two-column layout to a stacked flow */
+@media screen and (max-width: 768px) {
     .head {
-        flex-direction: column;
-        align-items: center;
-        position: static;
-        padding: 15px 3%;
-        gap: 10px;
+        position: sticky;
+        padding: 14px 5%;
     }
-    
-    .head h5 {
-        font-size: 12px;
-        text-align: center;
-    }
-    
-    .end {
-        margin-top: 5px;
-    }
-    
-    /* Modal */
-    .poptitle {
-        position: static;
-        text-align: center;
-        padding: 20px 3%;
-    }
-    
-    .pop h1 {
-        font-size: 24px;
-        width: 95%;
-        line-height: 1.4em;
-        margin-top: 20px;
-    }
-    
-    /* Side nav becomes top section */
+
     .side {
         position: static;
-        width: 100%;
-        max-width: 100%;
-        margin: 20px 0;
-        padding: 0 5%;
+        width: auto;
+        max-width: none;
+        margin: 86px 5% 0;
     }
-    
+
     .side p {
+        max-width: 680px;
+        margin-top: 0;
         font-size: 14px;
-        line-height: 22px;
-        margin-top: 15px;
+        line-height: 1.6;
     }
-    
-    .side h6 {
-        display: none;
-    }
-    
-    .links {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 12px;
-    }
-    
-    .link-1 {
-        padding: 10px;
-        font-size: 12px;
-    }
-    
-    /* Main content */
+
+
     .main {
-        margin-top: 20px;
-        padding: 0 3% 60px;
+        margin-top: 28px;
+        padding: 0 5% 72px;
     }
-    
+
     .project {
         width: 100%;
-        margin-left: 0;
-        margin-top: 40px;
+        max-width: 760px;
+        margin: 0 auto 56px;
+    }
+
+    .image {
+        border-radius: 6px;
+    }
+
+    .pop {
+        padding: 20px 5%;
+    }
+
+    .pop h1 {
+        width: 100%;
+        margin-top: 72px;
+        font-size: clamp(26px, 5.5vw, 34px);
+    }
+}
+
+/* Mobile */
+@media screen and (max-width: 600px) {
+    .head {
+        position: static;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 14px 5%;
+    }
+
+    .head h5 {
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .end a {
+        padding-bottom: 4px;
+    }
+
+    .side {
+        margin: 24px 0 0;
+        padding: 0 5%;
+    }
+
+    .side p {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .links {
+        text-align: left;
+        margin-top: 10%;
+        line-height: 2;
+        font-size: .7em;
+    }
+    .links h5 {
+        font-size: .7em;
+    }
+
+    .link-1 {
+        min-height: 44px;
+        padding: 10px 6px;
+    }
+
+    .main {
+        margin-top: 16px;
+        padding: 0 5% 64px;
+    }
+
+    .project {
         margin-bottom: 40px;
     }
-    
-    /* Remove hover overlay on mobile, show text below */
+
+    /* On touch-sized screens, keep titles readable without hover. */
     .text {
         position: static;
-        opacity: 1;
-        background-color: transparent;
         height: auto;
-        padding: 15px 0;
+        opacity: 1;
+        background: transparent;
+        padding: 14px 2px 0;
     }
-    
+
     .project h3 {
-        font-size: 20px;
-        margin-top: 10px;
+        margin-top: 0;
+        font-size: clamp(18px, 5.5vw, 22px);
+        line-height: 1.25;
+        letter-spacing: .5px;
     }
-    
-    .p1 {
-        border-bottom: 2px solid black;
-    }
-    
+
     .project h4 {
-        font-size: 14px;
-        line-height: 1.4em;
+        font-size: clamp(13px, 4vw, 15px);
+        line-height: 1.5;
+        letter-spacing: .4px;
     }
-    
-    /* Adjust special image widths for mobile */
+
+    .p1 {
+        border-bottom-width: 2px;
+    }
+
     .image .kodak,
     .image .facility {
-        width: 60%;
+        width: min(65%, 320px);
     }
-    
+
     .image .ebay {
-        width: 50%;
+        width: min(58%, 280px);
     }
-    
-    /* Footer */
+
+    .poptitle {
+        position: static;
+        padding: 16px 0;
+    }
+
+    .pop h1 {
+        margin-top: 12px;
+        font-size: clamp(21px, 6vw, 26px);
+        line-height: 1.45;
+    }
+
     footer {
-        height: 45px;
+        height: auto;
+        min-height: 44px;
     }
-    
+
     .footer-links {
-        font-size: 12px;
-        margin-top: 15px;
+        margin: 0 5%;
+        min-height: 44px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 11px;
     }
-    
+
     .foot-1, .foot-2, .foot-3 {
-        padding: 12px;
+        padding: 10px 0 10px 12px;
     }
-    
-    /* Hide bokeh animations on mobile for performance */
-    .bokehuno, .bokehdos, .bokehtres, 
+
+    .bokehuno, .bokehdos, .bokehtres,
     .bokehquatro, .bokehcinco, .bokehsies {
         display: none;
     }
 }
 
-/* SMALL MOBILE (up to 375px) */
-@media screen and (max-width: 375px) {
+/* Small mobile */
+@media screen and (max-width: 380px) {
+    .head,
+    .side,
+    .main {
+        padding-left: 4%;
+        padding-right: 4%;
+    }
+
     .head h5 {
-        font-size: 10px;
+        font-size: 11px;
     }
-    
-    .pop h1 {
-        font-size: 20px;
-    }
-    
+
     .side p {
-        font-size: 12px;
-        line-height: 20px;
+        font-size: 13px;
     }
-    
+
+    .project {
+        margin-bottom: 34px;
+    }
+
     .project h3 {
         font-size: 18px;
     }
-    
+
     .project h4 {
         font-size: 13px;
+    }
+}
+
+/* Devices that do not truly support hover should never hide project labels. */
+@media (hover: none), (pointer: coarse) {
+    .text {
+        position: static;
+        height: auto;
+        opacity: 1;
+        background: transparent;
+        padding: 14px 0;
     }
 }
