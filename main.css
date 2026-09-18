@@ -107,6 +107,11 @@ a:visited {
     color: black;
 }
 
+.side .quote {
+    font-size: 0.8em;
+    font-style: italic;
+}
+
 .link-1 {
     text-decoration: none;
     color: black;
