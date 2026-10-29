@@ -44,6 +44,11 @@ a:visited {
     flex-grow: ;
 }
 /*photo*/
+.body-img {
+    width: 75%;
+    margin: 0 auto;      
+    text-align: center;  
+}
 .container {
  max-width: 1000px;
  margin: 0 auto;
@@ -137,6 +142,10 @@ a:visited {
         padding-bottom:5%;
     }
 
+.tabs {
+    width: 60%
+}
+
 /*footer*/
 /*
 footer {
@@ -225,3 +234,9 @@ footer {
 
 
 }
+
+/*prototype links*/
+.protos ul { list-style: none; padding: 0; margin: 0 0 1em 0; }
+.protos li { margin-bottom: 8px; }
+.protos a { text-decoration: none; color: black; border-bottom: 2px solid black; padding-bottom: 2px; transition: .3s ease; }
+.protos a:hover { color: #FF5335; border-bottom-color: #FF5335; }

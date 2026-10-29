@@ -29,7 +29,15 @@
 
             <div class="text">
         <div class="descript">
-            <p><b>PROJECT OVERVIEW:</b> This project explores how to simplify a complex internal ads management tool while preserving the flexibility power users need. As the platform grew, navigation, filters, and settings became increasingly dense and difficult to distinguish. I redesigned the experience around clearer hierarchy, progressive disclosure, and more predictable configuration flows. The result is a more scalable system that makes complex workflows easier to understand and manage.</p>
+            <p><b>PROJECT OVERVIEW:</b> Meta's internal ads management tools support high-frequency, high-stakes workflows for the teams who build and monitor advertising campaigns at scale. As the tool grew, navigation, filters, and account-level settings all competed for the same sidebar space, making it harder for people to tell what they were looking at, let alone act on it quickly. I led a redesign of the core navigation and configuration experience, moving from a single dense sidebar to a structured, tab-based system that separates where you're working, what you're viewing, and how the tool behaves — while keeping every control a power user relies on just as reachable as before.</p>
+            <div class="protos">
+    <p><b>TRY ME:</b> I built 3 key user journeys as clickable prototypes :) Please check it out. *The data is sample data.</p>
+    <ul>
+        <li><a href="prototypes/flow-1-reopen-campaign.html" target="_blank" rel="noopener">Flow 1 &rarr; Reopen a past campaign</a></li>
+        <li><a href="prototypes/flow-2-new-campaign.html" target="_blank" rel="noopener">Flow 2 &rarr; Start a new campaign</a></li>
+        <li><a href="prototypes/flow-3-change-setting.html" target="_blank" rel="noopener">Flow 3 &rarr; Change a setting</a></li>
+    </ul>
+</div>
         </div>
         <div class="info">
         <p><span>Project Name : META Ads Infra Side Bar</span></p>
@@ -39,104 +47,82 @@
         </div>
 
 <section class="">
+    
 <div>
     <h2>Problem</h2>
-    <p>As the platform grew, navigation, filters, and persistent settings began competing for space within the same interface. The challenge was not to remove complexity, but to organize it more effectively. This created three key challenges:
+    <p>Three types of controls — navigation, filters, and persistent settings — lived in the same scrolling sidebar, with no visual system to tell them apart:
         <div>
-        <ul>• High information density made important controls harder to scan.</ul>
-        <ul>• Navigation and filters lacked a clear separation.</ul>
-        <ul>• Temporary filters and persistent settings behaved similarly, making their impact unclear.</ul>
+        <ul>• High information density made it hard to scan for the one control you needed.</ul>
+        <ul>• Navigation and filtering had no clear separation, so switching where you were working and what you were viewing felt like the same action.</ul>
+        <ul>• Temporary filters and persistent settings looked and behaved similarly, so it wasn't obvious whether a change affected only your current view or your account going forward.</ul>
         </div>
 
     </p>
 </div>
 <div>
     <h2>Observations</h2>
-    <p>Internal users often perform repetitive, high-frequency tasks and need immediate access to advanced controls. Moving everything behind menus would make the interface cleaner, but potentially slower to use.
+    <p>Internal users perform the same handful of tasks dozens of times a day, so speed and predictability mattered more than minimizing clicks in the abstract. Rather than nesting everything behind menus, I organized the tool around three questions:
 
 Instead, I organized the experience around three questions:
 
-Navigate — Where am I working?
-Filter — What information do I need right now?
-Configure — How should the tool behave by default?
+<ul>• Navigate — Where am I working?</ul>
+<ul>• Filter — What information do I need right now?</ul>
+<ul>• Configure — How should the tool behave by default?</ul>
 
-This framework helped establish a clearer hierarchy while keeping important controls accessible.</p>
+This became the basis for a persistent three-way tab switcher — Navigate, Filters, Settings — that replaced the old single scrolling list.</p>
 </div>
 <div class="body-img">
-<img class="detail" src="ex1.png">
+<img class="tabs" src="ex1.png">
 </div>
 
 <div>
     <h2>Tasks & Actions</h2>
     <p>
-        <h4>01. Restructure the sidebar</h4>
+        <h4>01. Split the sidebar into a tab system instead of one long list</h4>
 
-I separated the sidebar into clear functional groups: primary navigation, advanced tools, contextual filters, saved views, and account controls.
 
-Frequently used destinations remain immediately accessible, while specialized features such as experiments and automation are visually separated.
-
-This improves scanability and gives the sidebar a structure that can scale as new functionality is introduced.
+Rather than stacking navigation, filters, and settings vertically (which forced scrolling as the tool grew), I moved to a segmented tab switcher at the top of the sidebar. Each tab owns a fixed-height panel, so the sidebar never grows past the viewport regardless of how many filters or settings exist underneath — a structural fix for the density problem, not just a visual one.
 
 <div class="body-img">
-<img class="detail" src="ex1.png">
+<img class="detail" src="ex2.png">
 </div>
 
 
 
-<h4>02. Create a more focused filtering experience</h4>
+<h4>02. Design a focused, scalable filtering experience</h4>
 
-Common controls such as date range, campaign type, status, and delivery are prioritized.
+The Filters tab prioritizes what people reach for most: date range with quick presets, campaign type, and delivery. A "+ Add filter" control opens a searchable picker split into Suggested filters (Status, Delivery, Objective) and the full filter catalog (Budget range, ROAS range, Placement, Audience, Bid strategy) — so adding a new filter type to the product later never means redesigning the sidebar, only adding one row to a list. Selected filters surface as removable chips directly under Quick Filters, making active state visible without opening anything.
 
-More specialized controls—including budget, spend, impressions, and ROAS ranges—sit within advanced filters.
-
-Quick filters and saved views also allow users to reuse common configurations rather than repeatedly rebuilding the same workspace.
-
-
-
-
-<h4>03. Separate filters from persistent settings</h4>
-
-A key improvement was distinguishing between temporary and persistent changes.
-
-Filters modify the current dataset or view.
-
-Settings control longer-term system behavior.
-
-Persistent preferences such as default date range, timezone, KPI configuration, notifications, permissions, and integrations therefore move into a dedicated Settings experience.
 
 <div class="body-img">
-<img class="detail" src="ex1.png">
+<img class="detail" src="ex3.png">
 </div>
 
 
-<h4>04. Clarify deeper configuration flows</h4>
+<h4>03. Give the filtering experience a real empty state</h4>
 
-Settings use a simple progressive flow:
+For a brand-new campaign with no data yet, the Filters tab makes "nothing is configured" explicit rather than showing the same UI with blank values. Dashed borders on unset fields, muted placeholder copy ("No date range set," "Select type"), and a short inline explanation ("Filters will scope the data you see once this campaign has activity") keep the screen legible instead of looking broken.
 
-Default view → Settings → Select preference → Adjust → Save
+<div class="body-img">
+<img class="detail" src="ex4.png">
+</div>
 
-Clear selection states communicate which setting is being edited, while focused configuration pages remove unrelated controls from the immediate task.
 
-For example, selecting Default Date Range opens a dedicated experience where users can choose presets, custom dates, comparison behavior, and timezone preferences before saving their changes.
----
-The redesigned concept creates a clearer interaction hierarchy:
 
-Navigate → Filter → Configure → Save
+<h4>04. Make workspace switching and management distinct actions</h4>
 
-Users can still access the depth expected from an infrastructure tool, but controls are presented according to their purpose and frequency of use.
-
-The approach also creates a more scalable framework. New filters can be added without overwhelming primary navigation, while persistent preferences can expand within the Settings architecture.
+<p>Switching context between workspaces and managing them are different tasks with different stakes, so I designed them as two separate surfaces. The workspace switcher is a lightweight dropdown for quick context changes — searchable, with each workspace showing a live stat (active campaign count) and the current one checked. "Manage workspaces" opens a full page with role, member count, and creation date per workspace, since renaming, auditing access, or transferring ownership are deliberate actions that deserve their own space rather than living inside a quick-switch menu.
 </p>
 
+
+
+
 </div>
 
+
 <div class="bottom">
-    <h2>Concluding Thoughts</h2>
-    <p>This exploration reinforced that simplifying an internal tool doesn't necessarily mean reducing its capabilities.
-
-For expert users, complexity is often necessary. The design opportunity is to make that complexity structured, predictable, and easier to navigate.
-
-By separating navigation, contextual filtering, and persistent settings, the experience preserves the flexibility of a powerful ads platform while making everyday workflows easier to understand and manage.</p>
+    <h2>Outcome</h2>
+    <p>The redesigned system creates a clear interaction model — Navigate → Filter → Configure — where every control lives exactly where its purpose suggests it should. Power users retain full access to the depth an infrastructure tool requires, but nothing competes for attention with something unrelated to it. The tab structure, searchable filter/settings pickers, and dedicated workspace management page also make the system scalable by design: new filters, new settings, and new workspaces can all be added without the sidebar itself growing denser or requiring a redesign.</p>
 </div>
 </section>
 
