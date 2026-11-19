@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accessibility Lab — live device preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pg:#ECEEF2; --panel:#FFFFFF; --ink:#16181D; --ink2:#535966; --line:#DDE0E6; --soft:#F4F5F8;
+  --ui:#3346D3; --ui-ink:#fff; --pass:#1B7339; --fail:#BE1E2D; --warn:#8F5400;
+  --pass-bg:#E3F3E8; --fail-bg:#FBE6E8; --warn-bg:#FCF0DC; --dot:#CDD2DA; --track:#B9BEC8;
+  --mono:"IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --pg:#0E1014; --panel:#171A20; --ink:#ECEEF2; --ink2:#A3A9B4; --line:#2A2F38; --soft:#1E222A;
+    --ui:#8E9CFF; --ui-ink:#0E1014; --pass:#62D48C; --fail:#FF7D88; --warn:#F2B457;
+    --pass-bg:#14301F; --fail-bg:#3A191D; --warn-bg:#382A12; --dot:#252A33; --track:#444B57; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:"IBM Plex Sans",system-ui,sans-serif;background:var(--pg);color:var(--ink);font-size:14px;line-height:1.45}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ui);outline-offset:2px}
+
+/* ---------- page header ---------- */
+.top{display:flex;align-items:center;gap:20px;padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand-mark{width:30px;height:30px;border-radius:8px;background:var(--ink);color:var(--panel);display:grid;place-items:center}
+.brand h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.01em}
+.brand p{margin:0;font-size:12px;color:var(--ink2)}
+.seg{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:7px 12px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:7px;font-weight:500;color:var(--ink2);white-space:nowrap}
+.seg button svg{width:16px;height:16px}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12),0 0 0 1px var(--line)}
+.ghost{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:500}
+.ghost:hover{background:var(--soft)}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr) 360px;height:calc(100vh - 59px)}
+.panel{background:var(--panel);overflow-y:auto;padding:18px 18px 40px}
+.settings{border-right:1px solid var(--line)}
+.compliance{border-left:1px solid var(--line)}
+.panel h2{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);margin:22px 0 8px;font-weight:600}
+.panel h2:first-child{margin-top:0}
+.group{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.srow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid var(--line);cursor:pointer;min-height:48px}
+.srow:first-child{border-top:0}
+.srow:hover{background:var(--soft)}
+.srow .txt{flex:1;min-width:0}
+.srow .t{display:block;font-weight:500}
+.srow .d{display:block;font-size:12px;color:var(--ink2);line-height:1.35}
+.tg{appearance:none;-webkit-appearance:none;width:40px;height:24px;border-radius:12px;background:var(--track);position:relative;flex:none;cursor:pointer;margin:0;transition:background .15s}
+.tg::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s}
+.tg:checked{background:var(--ui)}
+.tg:checked::before{transform:translateX(16px)}
+.block{padding:12px;border-top:1px solid var(--line)}
+.block:first-child{border-top:0}
+.block label.t{display:block;font-weight:500;margin-bottom:6px}
+.seg.full{display:flex;width:100%}
+.seg.full button{flex:1;justify-content:center}
+.size-row{display:flex;align-items:center;gap:10px}
+.size-row .a-sm{font-size:12px;font-weight:600}
+.size-row .a-lg{font-size:20px;font-weight:600}
+input[type=range]{flex:1;accent-color:var(--ui)}
+.readout{font-family:var(--mono);font-size:12px;color:var(--ink2);margin-top:4px}
+select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+
+/* ---------- stage ---------- */
+.stage{display:flex;flex-direction:column;min-width:0;background-color:var(--pg);background-image:radial-gradient(var(--dot) 1px,transparent 1px);background-size:18px 18px}
+.stage-meta{display:flex;justify-content:center;gap:10px;padding:14px 16px 0;font-size:12px;color:var(--ink2);font-family:var(--mono)}
+.stage-meta b{color:var(--ink);font-family:"IBM Plex Sans";font-weight:600;font-size:13px}
+.fit{position:relative;flex:1;min-height:0}
+.sr{margin:0 auto 16px;max-width:min(640px,92%);display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--panel);border-radius:999px;padding:8px 16px 8px 10px;font-size:13px;min-height:40px}
+.sr .vo{flex:none;font-family:var(--mono);font-size:10px;font-weight:600;background:var(--panel);color:var(--ink);border-radius:999px;padding:3px 7px;letter-spacing:.04em}
+.sr .say{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr .warn{flex:none;font-size:11px;font-weight:600;background:#FFD7DB;color:#7A0B17;border-radius:6px;padding:2px 7px}
+
+/* ---------- compliance ---------- */
+.gauges{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gauge{border:1px solid var(--line);border-radius:12px;padding:12px 8px 10px;text-align:center}
+.gauge svg{width:100%;max-width:150px;display:block;margin:0 auto}
+.gauge .lvl{font-size:12px;color:var(--ink2);font-weight:500;margin-top:-2px}
+.pill{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px}
+.pill.ok{background:var(--pass-bg);color:var(--pass)}
+.pill.no{background:var(--fail-bg);color:var(--fail)}
+.note{font-size:12px;color:var(--ink2);margin:10px 0 0}
+.checks{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.checks li+li{border-top:1px solid var(--line)}
+.check{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;width:100%;text-align:left;background:none;border:0;padding:10px 12px;cursor:pointer;align-items:start}
+.check:hover{background:var(--soft)}
+.check .st{grid-row:1/3;font-size:10px;font-weight:700;letter-spacing:.05em;border-radius:5px;padding:3px 6px;margin-top:1px;display:flex;align-items:center;gap:3px}
+.check .st.ok{background:var(--pass-bg);color:var(--pass)}
+.check .st.no{background:var(--fail-bg);color:var(--fail)}
+.check .nm{font-weight:500;line-height:1.3}
+.check .nm .sc{font-family:var(--mono);font-size:12px;color:var(--ink2);margin-right:4px}
+.check .lv{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.check .dt{grid-column:2/4;font-size:12px;color:var(--ink2);line-height:1.35}
+.check .dt i{font-style:normal;font-family:var(--mono);font-size:10.5px;opacity:.8}
+.issue-tag{font-family:var(--mono);font-size:10.5px;color:var(--ink2);background:var(--soft);border-radius:4px;padding:1px 5px;margin-left:4px;white-space:nowrap}
+.swatches{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:2px;cursor:pointer}
+.actions{display:flex;gap:8px;margin-top:10px}
+.actions .ghost{flex:1}
+.foot{font-size:11.5px;color:var(--ink2);margin-top:16px;line-height:1.5}
+
+@media (max-width:1240px){
+  .layout{grid-template-columns:290px minmax(0,1fr);grid-template-rows:auto auto;height:auto}
+  .stage{min-height:760px;position:sticky;top:0;height:100vh}
+  .compliance{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}
+  .settings{max-height:none}
+}
+@media (max-width:820px){
+  .layout{grid-template-columns:1fr}
+  .stage{position:relative;height:auto;min-height:620px;order:-1}
+  .stage .fit{min-height:520px}
+  .settings{border-right:0;border-top:1px solid var(--line)}
+}
+
+/* =================================================================
+   DEVICE FRAMES
+   ================================================================= */
+.device{position:absolute;left:50%;top:50%;transform-origin:50% 50%}
+.device .screen{position:relative;overflow:hidden;background:#000;isolation:isolate}
+.island,.browser,.crown,.sidebtn{display:none}
+.device.phone{padding:13px;border-radius:68px;background:#0c0c0e;box-shadow:0 0 0 1.5px #55555c,0 0 0 6px #202024,0 50px 90px -30px rgba(10,15,40,.55)}
+.device.phone .screen{width:402px;height:874px;border-radius:55px}
+.device.phone .island{display:block;position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:20px;background:#000;z-index:30}
+.device.tablet{padding:22px;border-radius:50px;background:#0c0c0e;box-shadow:0 0 0 1.5px #55555c,0 0 0 6px #202024,0 50px 90px -30px rgba(10,15,40,.55)}
+.device.tablet .screen{width:820px;height:1180px;border-radius:28px}
+.device.watch{padding:15px;border-radius:64px;background:#0b0b0d;box-shadow:0 0 0 2px #3c3c42,0 0 0 7px #1b1b1e,0 30px 60px -20px rgba(10,15,40,.6)}
+.device.watch .screen{width:208px;height:248px;border-radius:46px}
+.device.watch .crown{display:block;position:absolute;right:-14px;top:58px;width:12px;height:42px;border-radius:5px;background:linear-gradient(90deg,#2a2a2e,#5a5a60 60%,#2a2a2e)}
+.device.watch .sidebtn{display:block;position:absolute;right:-9px;top:122px;width:7px;height:50px;border-radius:4px;background:#2a2a2e}
+.device.desktop{border-radius:12px;overflow:hidden;background:#E9EAED;box-shadow:0 0 0 1px rgba(0,0,0,.12),0 40px 80px -30px rgba(10,15,40,.5)}
+.device.desktop .browser{display:flex;align-items:center;gap:16px;height:44px;padding:0 16px;background:#E9EAED;border-bottom:1px solid #D2D4D9;color:#3a3d44;font-family:-apple-system,system-ui,sans-serif}
+.device.desktop.dark .browser{background:#2B2C30;border-color:#3B3C41;color:#D9DADF}
+.browser .dots{display:flex;gap:8px}
+.browser .dots i{width:12px;height:12px;border-radius:50%;display:block}
+.browser .url{flex:1;max-width:520px;margin:0 auto;height:28px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px}
+.device.desktop.dark .url{background:#1C1D20}
+.device.desktop .screen{width:1280px;height:760px;border-radius:0}
+.screen.inverted .no-invert{filter:invert(1) hue-rotate(180deg)}
+
+/* =================================================================
+   PREVIEW APP  (everything scoped to #app)
+   ================================================================= */
+#app{
+  --u:1px; --tse:1; --tsh:1;
+  --bg:#F2F2F7; --surface:#FFFFFF; --label:#000000; --label2:#6C6C70; --sep:rgba(60,60,67,.2);
+  --field-border:#8A8A8E; --track-off:#8A8A8E; --fill:#E9E9EE; --tabbar:rgba(249,249,251,.78);
+  --danger:#D70015; --card-border:transparent;
+  --accent:#0062CC; --accent-fill:#0062CC;
+  --wr:400; --wm:500; --ws:600; --wb:700;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","Segoe UI",Roboto,sans-serif;
+  position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--bg);color:var(--label);font-family:var(--font);font-weight:var(--wr);
+  line-height:1.3;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased;
+}
+#app.theme-dark{--bg:#000000;--surface:#1C1C1E;--label:#FFFFFF;--label2:#AEAEB2;--sep:rgba(84,84,88,.6);
+  --field-border:#8E8E93;--track-off:#7C7C80;--fill:#2C2C2E;--tabbar:rgba(22,22,24,.8)}
+#app.hc{--label2:#3A3A3C;--field-border:#3A3A3C;--track-off:#545458;--sep:rgba(0,0,0,.45);--card-border:rgba(0,0,0,.4);--fill:#DCDCE1}
+#app.theme-dark.hc{--label2:#D1D1D6;--field-border:#C7C7CC;--track-off:#AEAEB2;--sep:rgba(255,255,255,.45);--card-border:rgba(255,255,255,.45);--fill:#3A3A3C}
+#app.iss-lowtext{--label2:#B3B3B8 !important}
+#app.theme-dark.iss-lowtext{--label2:#55555A !important}
+#app.iss-faint{--field-border:#DCDCE0 !important;--track-off:#E6E6EA !important}
+#app.theme-dark.iss-faint{--field-border:#38383B !important;--track-off:#333336 !important}
+#app.bold{--wr:600;--wm:700;--ws:700;--wb:800}
+#app.legible{--font:"Atkinson Hyperlegible",-apple-system,system-ui,sans-serif}
+#app.dev-desktop{--u:.94px}
+#app.dev-watch{--u:.88px}
+#app *{box-sizing:border-box}
+#app :focus{outline:none}
+#app :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#app.iss-nofocus :focus-visible{outline:none !important}
+#app h1,#app h2,#app p{margin:0}
+#app button{font-family:inherit}
+
+/* text spacing (WCAG 1.4.12 test values) */
+#app.spacing,#app.spacing *{line-height:1.5 !important;letter-spacing:.12em !important;word-spacing:.16em !important}
+#app.spacing p{margin-bottom:2em !important}
+#app.rmotion *,#app.rmotion{transition:none !important;animation:none !important}
+
+/* status bar */
+.statusbar{display:flex;align-items:center;justify-content:space-between;flex:none;color:var(--label);font-weight:600;font-family:-apple-system,system-ui,sans-serif;letter-spacing:0 !important;line-height:1 !important}
+.statusbar .sb-icons{display:flex;gap:6px;align-items:center}
+.statusbar svg{fill:currentColor;display:block}
+.dev-phone .statusbar{height:56px;padding:16px 30px 0 40px;font-size:17px}
+.dev-tablet .statusbar{height:28px;padding:6px 22px 0;font-size:13px}
+.dev-desktop .statusbar{display:none}
+.dev-watch .statusbar{height:30px;padding:9px 22px 0;justify-content:flex-end;font-size:15px}
+.dev-watch .sb-icons{display:none}
+
+.body{flex:1;display:flex;min-height:0}
+.scroll{flex:1;min-width:0;overflow-y:auto;overflow-x:auto;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.content{display:grid;gap:14px;align-content:start;grid-template-columns:minmax(0,1fr)}
+.dev-phone .content{padding:6px 16px 118px}
+.dev-tablet .content{padding:24px 28px 48px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.dev-desktop .content{padding:32px 40px 48px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));max-width:1020px}
+.dev-watch .content{padding:2px 10px 22px;gap:8px}
+.app-head,.hero{grid-column:1/-1}
+#app.iss-fixedw .content{min-width:470px}
+
+/* type */
+.eyebrow{font-size:calc(var(--u)*13*var(--tse));font-weight:var(--ws);text-transform:uppercase;letter-spacing:.04em;color:var(--label2)}
+.large-title{font-size:calc(var(--u)*34*var(--tsh));font-weight:var(--wb);line-height:1.15;letter-spacing:-.01em}
+.title2{font-size:calc(var(--u)*22*var(--tsh));font-weight:var(--ws);line-height:1.25}
+.headline{font-size:calc(var(--u)*17*var(--tse));font-weight:var(--ws)}
+.body-t{font-size:calc(var(--u)*17*var(--tse))}
+.secondary{font-size:calc(var(--u)*15*var(--tse));color:var(--label2);line-height:1.35}
+.overline{font-size:calc(var(--u)*13*var(--tse));font-weight:var(--ws);color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.big-num{font-size:calc(var(--u)*30*var(--tsh));font-weight:var(--wb);line-height:1.1}
+
+.app-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:6px}
+.head-actions{display:flex;gap:8px;flex:none}
+
+.card{background:var(--surface);border-radius:18px;padding:16px;border:1px solid var(--card-border)}
+.hero{padding:0;overflow:hidden}
+.hero-img{display:block;width:100%;height:calc(var(--u)*150)}
+.hero .card-body{padding:16px}
+.dev-desktop .hero,.dev-tablet .hero{display:grid;grid-template-columns:1fr 1fr}
+.dev-desktop .hero-img,.dev-tablet .hero-img{height:100%;min-height:230px}
+.doc{display:flex;gap:10px;align-items:center;margin:10px 0 2px}
+.doc svg{width:40px;height:40px;flex:none;border-radius:50%}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{font-size:calc(var(--u)*17*var(--tse));font-weight:var(--ws);min-height:44px;padding:10px 18px;border-radius:12px;border:0;cursor:pointer;line-height:1.2}
+.btn.primary{background:var(--accent-fill);color:#fff}
+.btn.plain{background:transparent;color:var(--accent)}
+#app.shapes .btn.plain{background:var(--fill)}
+.icon-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:0;background:var(--fill);color:var(--accent);cursor:pointer;flex:none;padding:0}
+.icon-btn svg{width:21px;height:21px}
+.icon-btn.sm{width:34px;height:34px}
+.icon-btn.sm svg{width:15px;height:15px}
+#app.iss-tiny .icon-btn{width:20px;height:20px}
+#app.iss-tiny .icon-btn svg{width:11px;height:11px}
+#app.iss-tiny .btn.plain{min-height:0;padding:0 2px;font-size:calc(var(--u)*13*var(--tse))}
+#app.iss-nopause .pause{display:none}
+
+.tips-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.tips-viewport{overflow:hidden}
+.tips-track{display:flex;transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+.tip{flex:0 0 100%;padding-right:12px;font-size:calc(var(--u)*15*var(--tse));line-height:1.35}
+.dots{display:flex;gap:6px;margin-top:10px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--sep);display:block}
+.dots i.on{background:var(--label)}
+#app.iss-fixedh .hero .title2{height:58px;overflow:hidden}
+#app.iss-fixedh .hero .secondary{height:42px;overflow:hidden}
+#app.iss-fixedh .tip{height:62px;overflow:hidden}
+
+.meter{height:8px;border-radius:4px;background:var(--fill);overflow:hidden;margin:10px 0 6px}
+.meter span{display:block;height:100%;width:78%;background:var(--accent-fill);border-radius:4px}
+.stat-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px}
+
+.field-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.field{flex:1;min-width:0;font-family:inherit;font-size:calc(var(--u)*17*var(--tse));color:var(--label);background:var(--bg);border:1.5px solid var(--field-border);border-radius:12px;padding:9px 14px;min-height:44px}
+.field::placeholder{color:var(--label2)}
+.fine{margin-top:10px}
+.inline-link{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+#app.iss-colorlinks .inline-link{text-decoration:none}
+#app.shapes .inline-link{text-decoration:underline !important}
+
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--sep);min-height:52px}
+.list-title+.row{border-top:0}
+.row-ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#fff;flex:none}
+.row-ico svg{width:17px;height:17px}
+.row-label{flex:1;font-size:calc(var(--u)*17*var(--tse))}
+.link-row{color:var(--label);text-decoration:none}
+.badge{background:var(--danger);color:#fff;font-size:calc(var(--u)*12*var(--tse));font-weight:var(--ws);padding:2px 8px;border-radius:10px}
+.chev{width:14px;height:14px;color:var(--label2);flex:none}
+.switch{position:relative;width:51px;height:31px;border-radius:16px;border:0;background:var(--track-off);flex:none;cursor:pointer;transition:background-color .2s;padding:0}
+.switch[aria-checked="true"]{background:var(--accent-fill)}
+.switch .knob{position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.25);transition:transform .2s}
+.switch[aria-checked="true"] .knob{transform:translateX(20px)}
+#app.onoff .switch::before{content:"";position:absolute}
+#app.onoff .switch[aria-checked="true"]::before{left:13px;top:10px;width:2px;height:11px;background:#fff;border-radius:1px}
+#app.onoff .switch[aria-checked="false"]::before{right:8px;top:10px;width:11px;height:11px;border:2px solid #fff;border-radius:50%}
+
+/* sidebar (tablet + desktop) */
+.sidebar{display:none;flex-direction:column;gap:4px;width:230px;flex:none;padding:20px 12px;background:var(--surface);border-right:1px solid var(--sep)}
+.dev-tablet .sidebar,.dev-desktop .sidebar{display:flex}
+.dev-tablet .sidebar{width:210px}
+.brandmark{display:flex;align-items:center;gap:9px;font-weight:var(--wb);font-size:calc(var(--u)*20*var(--tsh));padding:4px 10px 18px}
+.brandmark span.m{width:28px;height:28px;border-radius:8px;background:var(--accent-fill);display:grid;place-items:center;color:#fff;flex:none}
+.side-link{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:var(--label);text-decoration:none;font-size:calc(var(--u)*15*var(--tse));min-height:44px;font-weight:var(--wm)}
+.side-link svg{width:19px;height:19px;flex:none;color:var(--accent)}
+.side-link[aria-current="page"]{background:var(--fill)}
+
+/* tab bar (phone) */
+.tabbar{display:none}
+.dev-phone .tabbar{display:flex;position:absolute;left:0;right:0;bottom:0;padding:6px 8px 30px;background:var(--tabbar);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);border-top:1px solid var(--sep);z-index:10}
+#app.rtrans .tabbar{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;color:var(--label2);font-size:calc(var(--u)*10.5*min(var(--tse),1.35));font-weight:var(--wm);padding:4px 0;min-height:46px;cursor:pointer}
+.tab svg{width:24px;height:24px}
+.tab[aria-current="page"]{color:var(--accent)}
+.home-ind{display:none}
+.dev-phone .home-ind,.dev-tablet .home-ind{display:block;position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:136px;height:5px;border-radius:3px;background:var(--label);z-index:20}
+.dev-tablet .home-ind{width:300px}
+
+/* accessibility text sizes: simplify layouts */
+#app.ax .hero{display:block}
+#app.ax .hero-img{height:calc(var(--u)*170);min-height:0}
+#app.ax .side-link svg{display:none}
+#app.ax .sidebar{width:270px}
+#app.ax.dev-tablet .sidebar{width:240px}
+#app.ax .content{grid-template-columns:minmax(0,1fr)}
+.side-link{overflow-wrap:normal}
+/* watch */
+.dev-watch .watch-hide{display:none !important}
+.dev-watch .card{padding:11px;border-radius:16px}
+.dev-watch .hero .card-body{padding:11px}
+.dev-watch .large-title{font-size:calc(var(--u)*19*var(--tsh))}
+.dev-watch .title2{font-size:calc(var(--u)*16*var(--tsh))}
+.dev-watch .btn{width:100%;border-radius:22px}
+.dev-watch .app-head{padding-top:0}
+
+/* flagged offenders */
+#app .a11y-flag{outline:3px dashed #E5007E !important;outline-offset:3px !important;animation:flag .9s ease-in-out 3}
+@keyframes flag{50%{outline-color:transparent}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="f-protan"><feColorMatrix type="matrix" values="0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0"/></filter>
+  <filter id="f-deutan"><feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/></filter>
+  <filter id="f-tritan"><feColorMatrix type="matrix" values="0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0"/></filter>
+</svg>
+
+<header class="top">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="4.5" r="2"/><path d="M5 8.5l7 1.5 7-1.5M12 10v5M12 15l-3.5 6M12 15l3.5 6"/></svg></div>
+    <div><h1>Accessibility Lab</h1><p>See accessibility settings change a real interface, and check it against WCAG 2.2 as you go</p></div>
+  </div>
+  <div class="seg" role="group" aria-label="Preview device" id="devSeg">
+    <button data-dev="desktop" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Desktop</button>
+    <button data-dev="phone" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>iPhone</button>
+    <button data-dev="tablet" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M11 18.5h2"/></svg>iPad</button>
+    <button data-dev="watch" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3.5"/><path d="M9 6l.6-4h4.8L15 6M9 18l.6 4h4.8l.6-4"/></svg>Apple Watch</button>
+  </div>
+  <button class="ghost" id="resetBtn">Reset all</button>
+</header>
+
+<main class="layout">
+  <!-- ============ SETTINGS ============ -->
+  <aside class="panel settings" aria-label="Accessibility settings">
+    <h2>Display &amp; Text Size</h2>
+    <div class="group">
+      <div class="block">
+        <span class="t" id="apLbl" style="display:block;font-weight:500;margin-bottom:6px">Appearance</span>
+        <div class="seg full" role="group" aria-labelledby="apLbl">
+          <button data-appearance="light" aria-pressed="true">☀︎ Light</button>
+          <button data-appearance="dark" aria-pressed="false">☾ Dark</button>
+        </div>
+      </div>
+      <div class="block">
+        <label class="t" for="ts">Text size</label>
+        <div class="size-row"><span class="a-sm" aria-hidden="true">A</span><input type="range" id="ts" min="0" max="11" step="1" value="3" data-k="ts"><span class="a-lg" aria-hidden="true">A</span></div>
+        <div class="readout" id="tsOut" aria-live="polite">Large (Default) · 17 pt · 100%</div>
+      </div>
+      <label class="srow"><span class="txt"><span class="t">Bold Text</span><span class="d">Heavier weight for all text</span></span><input type="checkbox" class="tg" role="switch" data-k="bold"></label>
+      <label class="srow"><span class="txt"><span class="t">Increase Contrast</span><span class="d">Darker secondary text, borders and tints</span></span><input type="checkbox" class="tg" role="switch" data-k="hc"></label>
+      <label class="srow"><span class="txt"><span class="t">Button Shapes</span><span class="d">Backgrounds on text buttons, underlined links</span></span><input type="checkbox" class="tg" role="switch" data-k="shapes"></label>
+      <label class="srow"><span class="txt"><span class="t">On/Off Labels</span><span class="d">Show I / O on switches</span></span><input type="checkbox" class="tg" role="switch" data-k="onoff"></label>
+      <label class="srow"><span class="txt"><span class="t">Reduce Transparency</span><span class="d">Solid backgrounds instead of blur</span></span><input type="checkbox" class="tg" role="switch" data-k="rt"></label>
+      <label class="srow"><span class="txt"><span class="t">Smart Invert</span><span class="d">Invert colors except images</span></span><input type="checkbox" class="tg" role="switch" data-k="invert"></label>
+      <div class="block">
+        <label class="t" for="filter">Color filter</label>
+        <select id="filter" data-k="filter">
+          <option value="none">Off</option>
+          <option value="gray">Grayscale</option>
+          <option value="protan">Protanopia simulation (red-blind)</option>
+          <option value="deutan">Deuteranopia simulation (green-blind)</option>
+          <option value="tritan">Tritanopia simulation (blue-blind)</option>
+        </select>
+      </div>
+    </div>
+
+    <h2>Motion</h2>
+    <div class="group">
+      <label class="srow"><span class="txt"><span class="t">Reduce Motion</span><span class="d">Stops auto-rotating content and transitions</span></span><input type="checkbox" class="tg" role="switch" data-k="rm"></label>
+    </div>
+
+    <h2>Reading</h2>
+    <div class="group">
+      <label class="srow"><span class="txt"><span class="t">Text spacing</span><span class="d">Applies the WCAG 1.4.12 test values: 1.5 line height, 0.12em letter spacing, 0.16em word spacing</span></span><input type="checkbox" class="tg" role="switch" data-k="spacing"></label>
+      <label class="srow"><span class="txt"><span class="t">Hyperlegible font</span><span class="d">Atkinson Hyperlegible, designed for low vision</span></span><input type="checkbox" class="tg" role="switch" data-k="legible"></label>
+    </div>
+  </aside>
+
+  <!-- ============ STAGE ============ -->
+  <section class="stage" aria-label="Device preview">
+    <div class="stage-meta" id="meta"></div>
+    <div class="fit" id="fit">
+      <div class="device phone" id="device">
+        <div class="browser" aria-hidden="true">
+          <div class="dots"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i></div>
+          <div class="url"><svg width="11" height="12" viewBox="0 0 11 12" fill="currentColor"><rect x="0" y="5" width="11" height="7" rx="1.5"/><path d="M2.5 5V3.5a3 3 0 0 1 6 0V5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>lumen.health/today</div>
+          <div style="width:52px"></div>
+        </div>
+        <div class="crown" aria-hidden="true"></div><div class="sidebtn" aria-hidden="true"></div>
+        <div class="screen" id="screen">
+          <div class="island no-invert" aria-hidden="true"></div>
+
+          <div id="app" class="dev-phone" lang="en" data-skipclip>
+            <div class="statusbar" aria-hidden="true">
+              <span>9:41</span>
+              <span class="sb-icons">
+                <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+                <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 12 5.4 9.2a3.7 3.7 0 0 1 5.2 0z"/><path d="M8 5.6c1.9 0 3.6.7 4.9 2l1.4-1.5A8.8 8.8 0 0 0 8 3.6a8.8 8.8 0 0 0-6.3 2.5l1.4 1.5A7 7 0 0 1 8 5.6z"/><path d="M8 0C4.9 0 2.1 1.2 0 3.2l1.4 1.4A9.4 9.4 0 0 1 8 2a9.4 9.4 0 0 1 6.6 2.6L16 3.2A11.4 11.4 0 0 0 8 0z"/></svg>
+                <svg width="27" height="12" viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.2" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="18" height="8" rx="1.8"/><rect x="24.6" y="4" width="1.6" height="4" rx=".8" opacity=".45"/></svg>
+              </span>
+            </div>
+
+            <div class="body">
+              <nav class="sidebar" aria-label="Main">
+                <div class="brandmark"><span class="m" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v18M3 12h18"/></svg></span>Lumen</div>
+                <a href="#" class="side-link" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg>Today</a>
+                <a href="#" class="side-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Visits</a>
+                <a href="#" class="side-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Messages</a>
+                <a href="#" class="side-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</a>
+              </nav>
+
+              <div class="scroll" id="scroll">
+                <div class="content" id="content">
+                  <header class="app-head">
+                    <div>
+                      <p class="eyebrow watch-hide">Saturday, 15 November</p>
+                      <h1 class="large-title">Good morning, Alex</h1>
+                    </div>
+                    <div class="head-actions watch-hide">
+                      <button class="icon-btn" data-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9a6 6 0 1 1 12 0c0 6.5 2.5 8 2.5 8h-17S6 15.5 6 9"/><path d="M10 21h4"/></svg></button>
+                      <button class="icon-btn" data-label="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg></button>
+                    </div>
+                  </header>
+
+                  <section class="card hero" data-skipclip>
+                    <svg class="hero-img no-invert watch-hide" role="img" data-alt="Illustration of the sun rising over green hills" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid slice">
+                      <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE7BF"/><stop offset="1" stop-color="#FFB98A"/></linearGradient></defs>
+                      <rect width="400" height="180" fill="url(#sky)"/>
+                      <circle cx="262" cy="104" r="40" fill="#FF8A3D"/>
+                      <circle cx="262" cy="104" r="56" fill="#FF8A3D" opacity=".18"/>
+                      <path d="M0 128C70 96 140 98 210 120s140 26 190 6v54H0z" fill="#7DBB7A"/>
+                      <path d="M0 150c80-30 170-26 250-4s110 16 150 4v30H0z" fill="#4E9A5E"/>
+                      <path d="M0 168c90-16 200-14 280 0s90 6 120 0v12H0z" fill="#2F7245"/>
+                    </svg>
+                    <div class="card-body">
+                      <p class="overline">Next visit</p>
+                      <h2 class="title2">Annual check-up with Dr. Mori</h2>
+                      <p class="secondary">Tue 18 Nov · 10:30 · Harbor Clinic, Room 4</p>
+                      <div class="doc watch-hide">
+                        <svg class="no-invert" role="img" data-alt="Photo of Dr. Hana Mori" viewBox="0 0 40 40"><rect width="40" height="40" fill="#CFE0FF"/><circle cx="20" cy="16" r="7" fill="#E9B894"/><path d="M12.5 15c0-5 3.5-8 7.5-8s7.5 3 7.5 8c-1-2.5-4-4-7.5-4s-6.5 1.5-7.5 4z" fill="#2B2B33"/><path d="M7 40c1-8 6.5-12 13-12s12 4 13 12z" fill="#3F6FD6"/></svg>
+                        <div><div class="headline">Dr. Hana Mori</div><div class="secondary">General practice</div></div>
+                      </div>
+                      <div class="btn-row">
+                        <button class="btn primary" id="checkin">Check in</button>
+                        <button class="btn plain watch-hide">Reschedule</button>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="card tips" aria-roledescription="carousel" aria-label="Daily tips">
+                    <div class="tips-head">
+                      <h2 class="headline">Daily tips</h2>
+                      <button class="icon-btn sm pause" id="tipPause" data-label="Pause tips"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="pauseIco"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+                    </div>
+                    <div class="tips-viewport" data-skipclip>
+                      <div class="tips-track" id="tipsTrack">
+                        <p class="tip">Drink a glass of water when you wake up — it helps you feel more alert.</p>
+                        <p class="tip">A 10-minute walk after lunch can steady your energy through the afternoon.</p>
+                        <p class="tip">Put screens away 30 minutes before bed for deeper, calmer sleep.</p>
+                      </div>
+                    </div>
+                    <div class="dots" aria-hidden="true" id="dots"><i class="on"></i><i></i><i></i></div>
+                  </section>
+
+                  <section class="card watch-hide">
+                    <h2 class="headline">Activity</h2>
+                    <div class="stat-row">
+                      <div><div class="big-num">6,240</div><div class="secondary">steps of 8,000</div></div>
+                      <div><div class="big-num">7h 12m</div><div class="secondary">sleep last night</div></div>
+                    </div>
+                    <div class="meter" role="progressbar" aria-label="Steps toward daily goal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="78" aria-valuetext="78 percent"><span></span></div>
+                    <p class="secondary">78% of today's goal</p>
+                  </section>
+
+                  <section class="card watch-hide">
+                    <label class="headline" for="msg" id="msgLabel">Message your care team</label>
+                    <div class="field-row">
+                      <input class="field" id="msg" type="text" placeholder="Type a message…" autocomplete="off">
+                      <button class="icon-btn" data-label="Send message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14"/><path d="M21 3 14.5 21l-4.5-7-7-4.5z"/></svg></button>
+                    </div>
+                    <p class="secondary fine">Replies usually arrive within one working day. <a href="#" class="inline-link">Read our privacy notice</a>.</p>
+                  </section>
+
+                  <section class="card watch-hide">
+                    <h2 class="headline list-title" style="margin-bottom:4px">Reminders</h2>
+                    <div class="row"><span class="row-ico" style="background:#C4380E" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-40 12 12)"/><path d="m9.2 8.6 5.6 6.8" /></svg></span><span class="row-label" id="r1">Medication reminders</span><button class="switch" role="switch" aria-checked="true" aria-labelledby="r1"><span class="knob"></span></button></div>
+                    <div class="row"><span class="row-ico" style="background:#5B3CC4" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span class="row-label" id="r2">Appointment alerts</span><button class="switch" role="switch" aria-checked="false" aria-labelledby="r2"><span class="knob"></span></button></div>
+                    <a href="#" class="row link-row"><span class="row-ico" style="background:#1F7A44" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/></svg></span><span class="row-label">Test results</span><span class="badge">New</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+                  </section>
+                </div>
+              </div>
+            </div>
+
+            <nav class="tabbar" aria-label="Tabs">
+              <button class="tab" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg>Today</button>
+              <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Visits</button>
+              <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Messages</button>
+              <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</button>
+            </nav>
+            <div class="home-ind" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sr" id="sr" aria-hidden="true"><span class="vo">VOICEOVER</span><span class="say" id="srSay">Hover over or tab through the preview to hear what a screen reader would say</span></div>
+  </section>
+
+  <!-- ============ COMPLIANCE ============ -->
+  <aside class="panel compliance" aria-label="WCAG compliance">
+    <h2>WCAG 2.2 conformance</h2>
+    <div class="gauges" id="gauges"></div>
+    <p class="sr-only" id="liveSum" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></p>
+    <p class="note">Checks run on the preview every time something changes. Select a failing check to highlight the problem in the preview.</p>
+
+    <h2>Checks</h2>
+    <ul class="checks" id="checks"></ul>
+
+    <h2>Break the app</h2>
+    <p class="note" style="margin:0 0 8px">Add common design mistakes and watch the gauges respond.</p>
+    <div class="group" id="issues">
+      <label class="srow"><span class="txt"><span class="t">Low-contrast gray text <span class="issue-tag">1.4.3</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="lowtext"></label>
+      <label class="srow"><span class="txt"><span class="t">Links marked by color only <span class="issue-tag">1.4.1</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="colorlinks"></label>
+      <label class="srow"><span class="txt"><span class="t">Images with no alt text <span class="issue-tag">1.1.1</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="noalt"></label>
+      <label class="srow"><span class="txt"><span class="t">Unlabeled icon buttons <span class="issue-tag">4.1.2</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="nolabels"></label>
+      <label class="srow"><span class="txt"><span class="t">Text field with no linked label <span class="issue-tag">1.3.1</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="nofieldlabel"></label>
+      <label class="srow"><span class="txt"><span class="t">Auto-rotating tips, no pause <span class="issue-tag">2.2.2</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="nopause"></label>
+      <label class="srow"><span class="txt"><span class="t">Faint borders &amp; switches <span class="issue-tag">1.4.11</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="faint"></label>
+      <label class="srow"><span class="txt"><span class="t">Fixed font sizes <span class="issue-tag">1.4.4</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="fixedfont"></label>
+      <label class="srow"><span class="txt"><span class="t">Fixed-height text boxes <span class="issue-tag">1.4.4 · 1.4.12</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="fixedh"></label>
+      <label class="srow"><span class="txt"><span class="t">Fixed-width layout <span class="issue-tag">1.4.10</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="fixedw"></label>
+      <label class="srow"><span class="txt"><span class="t">Tiny tap targets <span class="issue-tag">2.5.8</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="tiny"></label>
+      <label class="srow"><span class="txt"><span class="t">Focus outline removed <span class="issue-tag">2.4.7</span></span></span><input type="checkbox" class="tg" role="switch" data-issue="nofocus"></label>
+      <div class="block">
+        <span class="t" style="display:block;font-weight:500;margin-bottom:8px">Brand color <span class="issue-tag">1.4.3 · 1.4.11</span></span>
+        <div class="swatches" role="group" aria-label="Brand color presets">
+          <button class="sw" data-accent="#0062CC" style="background:#0062CC" aria-label="Accessible blue #0062CC" aria-pressed="true"></button>
+          <button class="sw" data-accent="#007AFF" style="background:#007AFF" aria-label="iOS system blue #007AFF" aria-pressed="false"></button>
+          <button class="sw" data-accent="#6A3FD0" style="background:#6A3FD0" aria-label="Purple #6A3FD0" aria-pressed="false"></button>
+          <button class="sw" data-accent="#34C759" style="background:#34C759" aria-label="iOS green #34C759" aria-pressed="false"></button>
+          <button class="sw" data-accent="#FF9500" style="background:#FF9500" aria-label="Orange #FF9500" aria-pressed="false"></button>
+          <input type="color" id="accent" value="#0062CC" aria-label="Custom brand color">
+        </div>
+        <div class="readout" id="accOut"></div>
+      </div>
+    </div>
+    <div class="actions"><button class="ghost" id="breakAll">Break everything</button><button class="ghost" id="fixAll">Fix everything</button></div>
+
+    <p class="foot">Automated checks cover 12 WCAG 2.2 Level A and AA success criteria that a tool can measure: contrast, target size, reflow, text resize, text spacing and accessible names. Results show what this user sees with the current settings. Contrast is measured on the app's own colors, before any color filter or inversion. Full conformance also needs manual review, such as keyboard testing and testing with a real screen reader.</p>
+  </aside>
+</main>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const app = $('#app'), screen = $('#screen'), device = $('#device'), fitEl = $('#fit'), scroller = $('#scroll');
+
+const SIZES = [14,15,16,17,19,21,23,28,33,40,47,53];
+const SIZE_NAMES = ['xSmall','Small','Medium','Large (Default)','xLarge','xxLarge','xxxLarge','AX1','AX2','AX3','AX4','AX5'];
+const DEVICES = {
+  desktop:{name:'Desktop browser', dims:'1280 × 760 px', hash:'desktop', max:1},
+  phone:{name:'iPhone 16 Pro', dims:'402 × 874 pt', hash:'iphone', max:1},
+  tablet:{name:'iPad Air 11″', dims:'820 × 1180 pt', hash:'ipad', max:1},
+  watch:{name:'Apple Watch Series 10 · 46 mm', dims:'208 × 248 pt', hash:'watch', max:1.9}
+};
+const DEF = {dev:'phone', dark:false, ts:3, bold:false, hc:false, shapes:false, onoff:false, rt:false, invert:false, filter:'none', rm:false, spacing:false, legible:false, accent:'#0062CC'};
+let S = {...DEF};
+const ISS = new Set();
+const ALL_ISSUES = ['lowtext','colorlinks','noalt','nolabels','nofieldlabel','nopause','faint','fixedfont','fixedh','fixedw','tiny','nofocus'];
+
+/* ---------- color math ---------- */
+const hexToRgb = h => { h=h.replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); const n=parseInt(h,16); return [n>>16&255,n>>8&255,n&255]; };
+const rgbToHex = a => '#'+a.map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('').toUpperCase();
+const mix = (a,b,t) => a.map((v,i)=>v+(b[i]-v)*t);
+function parseColor(str){
+  const m = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+%?))?\s*\)/.exec(str||'');
+  if(!m) return {r:0,g:0,b:0,a:0};
+  let a = m[4]===undefined ? 1 : (m[4].endsWith('%') ? parseFloat(m[4])/100 : parseFloat(m[4]));
+  return {r:+m[1], g:+m[2], b:+m[3], a};
+}
+const blend = (top,bot) => ({r:top.r*top.a+bot.r*(1-top.a), g:top.g*top.a+bot.g*(1-top.a), b:top.b*top.a+bot.b*(1-top.a), a:1});
+function lum(c){ const f=v=>{v/=255; return v<=0.03928? v/12.92 : Math.pow((v+0.055)/1.055,2.4)}; return 0.2126*f(c.r)+0.7152*f(c.g)+0.0722*f(c.b); }
+function ratio(a,b){ const l1=lum(a), l2=lum(b); return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05); }
+const rgbObj = a => ({r:a[0],g:a[1],b:a[2],a:1});
+function effectiveBg(el){
+  const layers=[]; let n=el;
+  while(n){
+    const c=parseColor(getComputedStyle(n).backgroundColor);
+    if(c.a>0){ layers.push(c); if(c.a>=0.999) break; }
+    if(n===app) break;
+    n=n.parentElement;
+  }
+  let base = (layers.length && layers[layers.length-1].a>=0.999) ? layers.pop() : {r:255,g:255,b:255,a:1};
+  for(let i=layers.length-1;i>=0;i--) base=blend(layers[i],base);
+  return base;
+}
+const fmt = r => (Math.floor(r*10)/10).toFixed(1)+':1';
+
+/* ---------- DOM helpers ---------- */
+const vis = el => el.getClientRects().length>0 && getComputedStyle(el).visibility!=='hidden';
+const Q = sel => [...app.querySelectorAll(sel)].filter(e=>vis(e) && !e.closest('[aria-hidden="true"]'));
+function textOf(node){
+  if(node.nodeType===3) return node.data;
+  if(node.nodeType!==1) return '';
+  if(node.getAttribute('aria-hidden')==='true' || node.tagName==='svg' || node.tagName==='STYLE') return '';
+  return [...node.childNodes].map(textOf).join('');
+}
+function accName(el){
+  const lb = el.getAttribute('aria-labelledby');
+  if(lb) return lb.split(/\s+/).map(id=>{const t=document.getElementById(id); return t? textOf(t):''}).join(' ').trim();
+  const al = el.getAttribute('aria-label'); if(al && al.trim()) return al.trim();
+  if(el.labels && el.labels.length) return [...el.labels].map(textOf).join(' ').trim();
+  if(el.getAttribute('role')==='img' || el.tagName==='INPUT') return '';
+  return textOf(el).replace(/\s+/g,' ').trim();
+}
+const interactive = () => Q('button, a[href], input, select, textarea, [role="switch"]');
+
+/* ---------- apply settings ---------- */
+function setScale(ts, full){
+  const fixed = ISS.has('fixedfont');
+  const e = fixed ? 1 : ts;
+  app.style.setProperty('--tse', e);
+  app.style.setProperty('--tsh', fixed ? 1 : (full ? e : 1+(e-1)*0.65));
+}
+function accents(){
+  const base = hexToRgb(S.accent), W=[255,255,255], B=[0,0,0];
+  let a, f;
+  if(!S.dark){ a = S.hc ? mix(base,B,.3) : base; f = a; }
+  else { a = mix(base,W, S.hc ? .55 : .35); f = mix(base,W,.1); }
+  return {accent:rgbToHex(a), fill:rgbToHex(f)};
+}
+function apply(){
+  const cls = ['dev-'+S.dev];
+  if(S.dark) cls.push('theme-dark');
+  [['hc','hc'],['bold','bold'],['shapes','shapes'],['onoff','onoff'],['rt','rtrans'],['rm','rmotion'],['spacing','spacing'],['legible','legible']].forEach(([k,c])=>{ if(S[k]) cls.push(c); });
+  ISS.forEach(i=>cls.push('iss-'+i));
+  if(!ISS.has('fixedfont') && SIZES[S.ts]/17>=1.6) cls.push('ax');
+  app.className = cls.join(' ');
+  device.className = 'device '+S.dev+(S.dark?' dark':'');
+
+  setScale(SIZES[S.ts]/17);
+  const ac = accents();
+  app.style.setProperty('--accent', ac.accent);
+  app.style.setProperty('--accent-fill', ac.fill);
+
+  const f=[];
+  if(S.invert) f.push('invert(1) hue-rotate(180deg)');
+  if(S.filter==='gray') f.push('grayscale(1)');
+  else if(S.filter!=='none') f.push(`url(#f-${S.filter})`);
+  screen.style.filter = f.join(' ');
+  screen.classList.toggle('inverted', S.invert);
+
+  app.querySelectorAll('[data-alt]').forEach(e=>{ ISS.has('noalt') ? e.removeAttribute('aria-label') : e.setAttribute('aria-label', e.dataset.alt); });
+  app.querySelectorAll('[data-label]').forEach(e=>{ ISS.has('nolabels') ? e.removeAttribute('aria-label') : e.setAttribute('aria-label', e.dataset.label); });
+  const ml = $('#msgLabel'); ISS.has('nofieldlabel') ? ml.removeAttribute('for') : ml.setAttribute('for','msg');
+
+  const px = SIZES[S.ts];
+  $('#tsOut').textContent = `${SIZE_NAMES[S.ts]} · ${px} pt · ${Math.round(px/17*100)}%`;
+  const D = DEVICES[S.dev];
+  $('#meta').innerHTML = `<b>${D.name}</b><span>${D.dims}</span><span id="scaleOut"></span>`;
+  if(S.rm) tipsTrack.style.transition='none'; else tipsTrack.style.transition='';
+  $('#accOut').textContent = `Link color ${ac.accent} · button color ${ac.fill}`;
+  schedule();
+}
+
+/* ---------- fit device to stage ---------- */
+function fit(){
+  const w = device.offsetWidth, h = device.offsetHeight;
+  const aw = fitEl.clientWidth - 48, ah = fitEl.clientHeight - 40;
+  const s = Math.max(.1, Math.min(DEVICES[S.dev].max, aw/w, ah/h));
+  device.style.transform = `translate(-50%,-50%) scale(${s})`;
+  device.dataset.scale = s;
+  const so = $('#scaleOut'); if(so) so.textContent = `shown at ${Math.round(s*100)}%`;
+}
+new ResizeObserver(()=>fit()).observe(fitEl);
+
+/* ---------- tips carousel ---------- */
+const tipsTrack = $('#tipsTrack'); let tipIdx=0, paused=false;
+setInterval(()=>{
+  if(paused || S.rm || !vis(tipsTrack)) return;
+  tipIdx=(tipIdx+1)%3;
+  tipsTrack.style.transform=`translateX(${-tipIdx*100}%)`;
+  [...$('#dots').children].forEach((d,i)=>d.classList.toggle('on',i===tipIdx));
+}, 4000);
+$('#tipPause').addEventListener('click',()=>{
+  paused=!paused;
+  const b=$('#tipPause'); b.dataset.label = paused ? 'Play tips' : 'Pause tips';
+  if(!ISS.has('nolabels')) b.setAttribute('aria-label', b.dataset.label);
+  $('#pauseIco').innerHTML = paused ? '<path d="M7 5v14l12-7z"/>' : '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>';
+  announce(b);
+});
+
+/* ---------- preview interactions ---------- */
+app.addEventListener('click', e=>{
+  const a = e.target.closest('a'); if(a) e.preventDefault();
+  const sw = e.target.closest('.switch'); if(sw){ sw.setAttribute('aria-checked', sw.getAttribute('aria-checked')==='true'?'false':'true'); announce(sw); schedule(); }
+  const tab = e.target.closest('.tab'); if(tab){ app.querySelectorAll('.tab').forEach(t=>t.removeAttribute('aria-current')); tab.setAttribute('aria-current','page'); announce(tab); schedule(); }
+  const sl = e.target.closest('.side-link'); if(sl){ app.querySelectorAll('.side-link').forEach(t=>t.removeAttribute('aria-current')); sl.setAttribute('aria-current','page'); }
+  if(e.target.closest('#checkin')){ const b=$('#checkin'); b.textContent = b.textContent==='Check in' ? 'Checked in ✓' : 'Check in'; announce(b); schedule(); }
+});
+
+/* ---------- screen reader caption ---------- */
+const ROLE = {BUTTON:'button', A:'link', INPUT:'text field', H1:'heading', H2:'heading', LABEL:'', P:'', SELECT:'pop-up button'};
+function announce(el){
+  const say = $('#srSay'); const box=$('#sr');
+  box.querySelector('.warn')?.remove();
+  let role = el.getAttribute('role');
+  role = role==='img' ? 'image' : role==='switch' ? 'switch button' : role==='progressbar' ? 'progress indicator' : (role || ROLE[el.tagName] || '');
+  let name = accName(el);
+  let extra = '';
+  if(el.getAttribute('role')==='switch') extra = el.getAttribute('aria-checked')==='true' ? ', on' : ', off';
+  if(el.getAttribute('role')==='progressbar') extra = ', '+(el.getAttribute('aria-valuetext')||'');
+  if(el.getAttribute('aria-current')==='page') extra += ', selected';
+  if(el.tagName==='A' && el.classList.contains('link-row')) name = name.replace(/\s+/g,' ');
+  let text;
+  if(!name){
+    text = role ? role.charAt(0).toUpperCase()+role.slice(1) : '';
+    const w=document.createElement('span'); w.className='warn'; w.textContent= role==='image' ? 'No description' : 'No label'; box.appendChild(w);
+  } else text = `“${name}”${role?', '+role:''}${extra}`;
+  say.textContent = text;
+}
+function srTarget(t){ return t.closest('button, a, input, [role="img"], [role="switch"], [role="progressbar"], h1, h2, label, p, .row-label, .big-num, .headline'); }
+app.addEventListener('pointerover', e=>{ const t=srTarget(e.target); if(t && app.contains(t)) announce(t); });
+app.addEventListener('focusin', e=>{ const t=srTarget(e.target); if(t) announce(t); });
+
+/* ---------- checks ---------- */
+function clipped(){
+  return [...app.querySelectorAll('*')].filter(el=>{
+    if(el.hasAttribute('data-skipclip') || el.closest('[aria-hidden="true"]')) return false;
+    const cs = getComputedStyle(el);
+    if(!/hidden|clip/.test(cs.overflowX+' '+cs.overflowY)) return false;
+    if(!textOf(el).trim() || !vis(el)) return false;
+    return el.scrollHeight > el.clientHeight+1 || el.scrollWidth > el.clientWidth+1;
+  });
+}
+let results = {};
+function runChecks(){
+  const cur = SIZES[S.ts]/17;
+  // Stress test 1.4.4: text at 200%
+  setScale(2, true); const clip200 = clipped(); setScale(cur);
+  // Stress test 1.4.12: WCAG text-spacing values
+  let clipSp;
+  if(S.spacing) clipSp = clipped();
+  else { app.classList.add('spacing'); clipSp = clipped(); app.classList.remove('spacing'); }
+
+  const R = [];
+  const add = (id,name,level,pass,detail,offenders=[],method='measured') => R.push({id,name,level,pass,detail,offenders,method});
+
+  // 1.1.1
+  const imgs = Q('[role="img"], img'); const noAlt = imgs.filter(e=>!accName(e));
+  add('1.1.1','Non-text content','A', !noAlt.length,
+    noAlt.length ? `${noAlt.length} of ${imgs.length} images have no text alternative` : (imgs.length ? `All ${imgs.length} visible images are described` : 'No images on this screen'), noAlt);
+
+  // 1.3.1
+  const fields = Q('input:not([type=hidden]), textarea, select');
+  const unl = fields.filter(f=>!((f.labels && f.labels.length) || f.getAttribute('aria-label') || f.getAttribute('aria-labelledby')));
+  add('1.3.1','Info and relationships','A', !unl.length,
+    unl.length ? `${unl.length} text field has visible text that isn't linked to it as a label` : (fields.length ? 'Form fields are linked to their labels' : 'No form fields on this screen'), unl);
+
+  // 1.4.1
+  const links = Q('a.inline-link'); const colorOnly=[]; let lr=null;
+  links.forEach(a=>{
+    const cs=getComputedStyle(a);
+    const ul = /underline/.test(cs.textDecorationLine||cs.textDecoration);
+    const r = ratio(parseColor(cs.color), parseColor(getComputedStyle(a.parentElement).color));
+    lr = r;
+    if(!ul && r<3) colorOnly.push(a);
+  });
+  add('1.4.1','Use of color','A', !colorOnly.length,
+    colorOnly.length ? `Link is shown only by color: ${fmt(lr)} against nearby text, no underline (needs underline or 3:1)` : (links.length ? 'Inline links have an underline or enough contrast with nearby text' : 'No inline links on this screen'), colorOnly);
+
+  // 2.2.2
+  const tips = app.querySelector('.tips'); const tipsVis = vis(tips);
+  const pauseVis = vis($('#tipPause'));
+  const p222 = !tipsVis || S.rm || pauseVis;
+  add('2.2.2','Pause, stop, hide','A', p222,
+    !tipsVis ? 'No auto-moving content' : pauseVis ? 'Rotating tips have a pause control' : S.rm ? 'Reduce Motion has stopped rotation, but there is still no pause control' : 'Tips rotate every 4 seconds with no way to pause them', p222?[]:[tips]);
+
+  // 4.1.2
+  const ctrls = interactive().filter(e=>!['INPUT','SELECT','TEXTAREA'].includes(e.tagName));
+  const noName = ctrls.filter(e=>!accName(e));
+  add('4.1.2','Name, role, value','A', !noName.length,
+    noName.length ? `${noName.length} of ${ctrls.length} controls have no accessible name` : `All ${ctrls.length} controls have a name and role`, noName);
+
+  // 1.4.3 contrast
+  const textEls = [...app.querySelectorAll('*')].filter(el=>!el.closest('[aria-hidden="true"]') && [...el.childNodes].some(n=>n.nodeType===3 && n.data.trim()) && vis(el));
+  const lowC=[]; let worst=null;
+  textEls.forEach(el=>{
+    const cs=getComputedStyle(el); const bg=effectiveBg(el); let fg=parseColor(cs.color); if(fg.a<1) fg=blend(fg,bg);
+    const size=parseFloat(cs.fontSize), wt=parseInt(cs.fontWeight)||400;
+    const large = size>=24 || (size>=18.66 && wt>=700);
+    const need = large?3:4.5; const r=ratio(fg,bg);
+    if(!worst || r/need < worst.r/worst.need) worst={r,need,el};
+    if(r<need) lowC.push(el);
+  });
+  const snip = el => { const t=textOf(el).trim().replace(/\s+/g,' '); return t.length>26? t.slice(0,25)+'…' : t; };
+  add('1.4.3','Contrast (minimum)','AA', !lowC.length,
+    lowC.length ? `${lowC.length} text items fail. Lowest is ${fmt(worst.r)} on “${snip(worst.el)}” (needs ${worst.need}:1)` : `All ${textEls.length} text items pass. Lowest is ${fmt(worst.r)}`, lowC);
+
+  // 1.4.4 resize text
+  if(ISS.has('fixedfont')) add('1.4.4','Resize text','AA', false, 'Text ignores the text size setting, so it never gets bigger', Q('.large-title, .title2'), 'tested at 200%');
+  else add('1.4.4','Resize text','AA', !clip200.length,
+    clip200.length ? `${clip200.length} text boxes cut off text at 200% size` : 'Text grows to 200% without being cut off', clip200, 'tested at 200%');
+
+  // 1.4.10 reflow
+  const sw=scroller.scrollWidth, cw=scroller.clientWidth;
+  add('1.4.10','Reflow','AA', sw<=cw+1,
+    sw>cw+1 ? `Content is ${sw}px wide in a ${cw}px screen, so it scrolls sideways` : `Content fits the ${cw}px width without sideways scrolling`, sw>cw+1?[$('#content')]:[]);
+
+  // 1.4.11 non-text contrast
+  const ntc=[]; let ntw=null;
+  Q('input.field').forEach(f=>{ const r=ratio(parseColor(getComputedStyle(f).borderTopColor), effectiveBg(f.parentElement)); if(!ntw||r<ntw.r) ntw={r,what:'Text field border'}; if(r<3) ntc.push(f); });
+  Q('.switch').forEach(s=>{ const r=ratio(parseColor(getComputedStyle(s).backgroundColor), effectiveBg(s.parentElement)); if(!ntw||r<ntw.r) ntw={r,what:s.getAttribute('aria-checked')==='true'?'Switch (on)':'Switch (off)'}; if(r<3) ntc.push(s); });
+  add('1.4.11','Non-text contrast','AA', !ntc.length,
+    !ntw ? 'No form controls on this screen' : ntc.length ? `${ntc.length} controls are hard to see. ${ntw.what} is ${fmt(ntw.r)} (needs 3:1)` : `Control edges pass. Lowest is ${fmt(ntw.r)} (${ntw.what.toLowerCase()})`, ntc);
+
+  // 1.4.12 text spacing
+  add('1.4.12','Text spacing','AA', !clipSp.length,
+    clipSp.length ? `${clipSp.length} text boxes cut off text when the WCAG spacing values are applied${S.spacing?'':'. Turn on Text spacing to see it'}` : 'Nothing is cut off with WCAG line, letter and word spacing', clipSp, 'stress test');
+
+  // 2.4.7
+  add('2.4.7','Focus visible','AA', !ISS.has('nofocus'),
+    ISS.has('nofocus') ? 'The focus outline is removed, so keyboard users can\'t see where they are' : 'A 3px outline shows which control has keyboard focus. Press Tab in the preview to see it', [], 'app style');
+
+  // 2.5.8 target size
+  const tg = interactive().filter(e=>!e.classList.contains('inline-link'));
+  const small = tg.filter(e=>e.offsetWidth<24 || e.offsetHeight<24);
+  const under44 = tg.filter(e=>e.offsetWidth<44 || e.offsetHeight<44).length;
+  add('2.5.8','Target size (minimum)','AA', !small.length,
+    small.length ? `${small.length} tap targets are smaller than 24 × 24 px` : `All ${tg.length} targets are at least 24 × 24 px${under44?` (${under44} are under Apple's recommended 44 pt)`:', and all meet Apple\'s 44 pt'}`, small);
+
+  results = Object.fromEntries(R.map(r=>[r.id,r]));
+  render(R);
+}
+
+function gaugeSvg(pass,total,met){
+  const pct = total ? pass/total*100 : 0;
+  const col = met ? 'var(--pass)' : pct>=70 ? 'var(--warn)' : 'var(--fail)';
+  return `<svg viewBox="0 0 140 86" aria-hidden="true">
+    <path d="M14 76 A56 56 0 0 1 126 76" fill="none" stroke="var(--line)" stroke-width="12" stroke-linecap="round"/>
+    <path d="M14 76 A56 56 0 0 1 126 76" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="${Math.max(pct,0.01)} 100" style="transition:stroke-dasharray .5s ease, stroke .3s"/>
+    <text x="70" y="66" text-anchor="middle" font-family="IBM Plex Sans" font-weight="700" font-size="26" fill="var(--ink)">${pass}<tspan font-size="15" fill="var(--ink2)" font-weight="500">/${total}</tspan></text>
+  </svg>`;
+}
+function render(R){
+  const A = R.filter(r=>r.level==='A'), AA = R;
+  const aP = A.filter(r=>r.pass).length, aaP = AA.filter(r=>r.pass).length;
+  const aMet = aP===A.length, aaMet = aaP===AA.length;
+  const pill = (met,fails,lvl) => met ? `<span class="pill ok">✓ Meets ${lvl}</span>` : `<span class="pill no">✕ ${fails} failing</span>`;
+  $('#gauges').innerHTML = `
+    <div class="gauge">${gaugeSvg(aP,A.length,aMet)}<div class="lvl">Level A</div>${pill(aMet,A.length-aP,'A')}</div>
+    <div class="gauge">${gaugeSvg(aaP,AA.length,aaMet)}<div class="lvl">Level AA <span style="opacity:.7">(includes A)</span></div>${pill(aaMet,AA.length-aaP,'AA')}</div>`;
+  const sum = `Level A: ${aP} of ${A.length} pass. Level AA: ${aaP} of ${AA.length} pass.`;
+  if($('#liveSum').textContent!==sum) $('#liveSum').textContent = sum;
+  $('#checks').innerHTML = R.map(r=>`<li><button class="check" data-id="${r.id}" ${r.offenders.length?'':'aria-disabled="true"'}>
+      <span class="st ${r.pass?'ok':'no'}">${r.pass?'✓ PASS':'✕ FAIL'}</span>
+      <span class="nm"><span class="sc">${r.id}</span>${r.name}</span>
+      <span class="lv">${r.level}</span>
+      <span class="dt">${r.detail} <i>· ${r.method}</i></span>
+    </button></li>`).join('');
+}
+$('#checks').addEventListener('click', e=>{
+  const b=e.target.closest('.check'); if(!b) return;
+  const r=results[b.dataset.id]; if(!r || !r.offenders.length) return;
+  app.querySelectorAll('.a11y-flag').forEach(x=>x.classList.remove('a11y-flag'));
+  r.offenders.forEach(x=>x.classList.add('a11y-flag'));
+  const first=r.offenders[0];
+  if(scroller.contains(first)){
+    const s=+device.dataset.scale||1;
+    const d=(first.getBoundingClientRect().top - scroller.getBoundingClientRect().top)/s;
+    scroller.scrollBy({top:d-60, behavior: S.rm?'auto':'smooth'});
+  }
+  clearTimeout(window.__flagT); window.__flagT=setTimeout(()=>app.querySelectorAll('.a11y-flag').forEach(x=>x.classList.remove('a11y-flag')), 3200);
+});
+
+let raf=0, late=0;
+function schedule(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(()=>{ fit(); runChecks(); }); clearTimeout(late); late=setTimeout(runChecks, 450); }
+
+/* ---------- controls ---------- */
+function syncControls(){
+  document.querySelectorAll('input[data-k].tg').forEach(i=>i.checked=!!S[i.dataset.k]);
+  $('#ts').value=S.ts; $('#filter').value=S.filter; $('#accent').value=S.accent;
+  document.querySelectorAll('[data-issue]').forEach(i=>i.checked=ISS.has(i.dataset.issue));
+  document.querySelectorAll('[data-dev]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.dev===S.dev));
+  document.querySelectorAll('[data-appearance]').forEach(b=>b.setAttribute('aria-pressed', (b.dataset.appearance==='dark')===S.dark));
+  document.querySelectorAll('.sw').forEach(b=>b.setAttribute('aria-pressed', b.dataset.accent.toUpperCase()===S.accent.toUpperCase()));
+}
+document.querySelectorAll('input[data-k]').forEach(i=>i.addEventListener('input',()=>{
+  const k=i.dataset.k;
+  S[k] = i.type==='checkbox' ? i.checked : i.type==='range' ? +i.value : i.value;
+  apply();
+}));
+$('#filter').addEventListener('change',()=>{ S.filter=$('#filter').value; apply(); });
+document.querySelectorAll('[data-issue]').forEach(i=>i.addEventListener('input',()=>{ i.checked?ISS.add(i.dataset.issue):ISS.delete(i.dataset.issue); apply(); }));
+document.querySelectorAll('[data-appearance]').forEach(b=>b.addEventListener('click',()=>{ S.dark = b.dataset.appearance==='dark'; syncControls(); apply(); }));
+function setDev(d, push){ if(!DEVICES[d]) return; S.dev=d; syncControls(); apply(); if(push){ try{ history.replaceState(null,'','#'+DEVICES[d].hash);}catch(e){ location.hash=DEVICES[d].hash; } } }
+document.querySelectorAll('[data-dev]').forEach(b=>b.addEventListener('click',()=>setDev(b.dataset.dev,true)));
+document.querySelectorAll('.sw').forEach(b=>b.addEventListener('click',()=>{ S.accent=b.dataset.accent; syncControls(); apply(); }));
+$('#accent').addEventListener('input',e=>{ S.accent=e.target.value.toUpperCase(); syncControls(); apply(); });
+$('#resetBtn').addEventListener('click',()=>{ const d=S.dev; S={...DEF, dev:d}; ISS.clear(); syncControls(); apply(); });
+$('#breakAll').addEventListener('click',()=>{ ALL_ISSUES.forEach(i=>ISS.add(i)); S.accent='#FF9500'; syncControls(); apply(); });
+$('#fixAll').addEventListener('click',()=>{ ISS.clear(); S.accent=DEF.accent; syncControls(); apply(); });
+
+function fromHash(){ const h=location.hash.slice(1); const d=Object.keys(DEVICES).find(k=>DEVICES[k].hash===h); if(d) setDev(d,false); }
+window.addEventListener('hashchange', fromHash);
+
+syncControls(); apply(); fromHash();
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+})();
+</script>
+</body>
+</html>
