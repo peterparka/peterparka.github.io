@@ -124,6 +124,49 @@ input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-rad
   .compliance{grid-column:1;grid-row:3;border-right:0}
 }
 
+/* ---------- use cases ---------- */
+.uc-intro{font-size:12px;color:var(--ink2);margin:-2px 0 8px}
+.uc-list{display:grid;gap:6px}
+.uc-card{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 12px;cursor:pointer;min-height:56px}
+.uc-card:hover{background:var(--soft)}
+.uc-card[aria-checked="true"]{border-color:var(--ui);box-shadow:0 0 0 1px var(--ui);background:var(--soft)}
+.uc-av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none;color:#fff}
+.uc-card .txt{flex:1;min-width:0}
+.uc-card .t{display:block;font-weight:600}
+.uc-card .d{display:block;font-size:12px;color:var(--ink2);line-height:1.35}
+.uc-panel{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:12px}
+.uc-panel[hidden]{display:none}
+.uc-goal{font-size:12.5px;color:var(--ink2);margin:0 0 10px;line-height:1.4}
+.uc-goal b{color:var(--ink);font-weight:600}
+.uc-steps{list-style:none;margin:0;padding:0}
+.uc-steps li{position:relative}
+.uc-steps li:not(:last-child)::before{content:"";position:absolute;left:11px;top:32px;bottom:-4px;width:2px;background:var(--line)}
+.uc-steps li.done:not(:last-child)::before{background:var(--ui)}
+.uc-step{display:grid;grid-template-columns:24px minmax(0,1fr);gap:0 10px;width:100%;text-align:left;background:none;border:0;padding:6px 0;cursor:pointer;border-radius:8px}
+.uc-num{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--track);display:grid;place-items:center;font-size:11px;font-weight:600;font-family:var(--mono);background:var(--panel);color:var(--ink2);position:relative;z-index:1}
+.done .uc-num{background:var(--ui);border-color:var(--ui);color:var(--ui-ink)}
+.uc-step[aria-current="step"] .uc-num{border-color:var(--ui);color:var(--ui);box-shadow:0 0 0 3px var(--soft),0 0 0 4.5px var(--ui)}
+.uc-st{font-weight:600;line-height:1.3;padding-top:3px}
+.uc-step:not([aria-current="step"]) .uc-st{color:var(--ink2);font-weight:500}
+.uc-body{grid-column:2;font-size:12.5px;color:var(--ink2);line-height:1.45;margin-top:4px}
+.uc-chips{grid-column:2;display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.uc-chip{font-size:11px;font-weight:600;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--ink);white-space:nowrap}
+.uc-chip.sim{border-style:dashed}
+.uc-chip.wcag{font-family:var(--mono);font-weight:500;color:var(--ink2);background:transparent}
+.uc-nav{display:flex;align-items:center;gap:8px;margin-top:10px}
+.uc-nav .ghost{flex:1}
+.uc-nav .ghost:disabled{opacity:.45;cursor:default}
+.uc-nav .pos{font-family:var(--mono);font-size:11px;color:var(--ink2);flex:none}
+.ghost.uc-next{background:var(--ui);border-color:var(--ui);color:var(--ui-ink)}
+.ghost.uc-next:hover{filter:brightness(1.08);background:var(--ui)}
+.uc-outcome{margin-top:10px;background:var(--pass-bg);color:var(--pass);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.45}
+.uc-outcome b{display:block;margin-bottom:2px}
+.uc-exit{margin-top:8px;background:none;border:0;padding:4px 0;color:var(--ui);font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:2px;font-size:12.5px}
+.uc-changed{animation:ucflash 1.8s ease}
+@keyframes ucflash{0%,45%{background:var(--soft);box-shadow:inset 3px 0 0 var(--ui)}100%{background:transparent;box-shadow:inset 3px 0 0 transparent}}
+#app .uc-focus{outline:3px solid var(--accent) !important;outline-offset:4px !important}
+@media (prefers-reduced-motion:reduce){.uc-changed{animation:none}}
+
 /* small screens: device switcher fills the row, icons hidden so it fits */
 @media (max-width:520px){
   #devSeg{width:100%}
@@ -358,6 +401,12 @@ input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-rad
 <main class="layout">
   <!-- ============ SETTINGS ============ -->
   <aside class="panel settings" aria-label="Accessibility settings">
+    <h2 id="ucHead">Use cases</h2>
+    <p class="uc-intro">Follow one person through the app and watch the settings they rely on change the preview.</p>
+    <div class="uc-list" id="ucList" role="radiogroup" aria-labelledby="ucHead"></div>
+    <div class="uc-panel" id="ucPanel" hidden></div>
+    <p id="ucLive" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></p>
+
     <h2>Display &amp; Text Size</h2>
     <div class="group">
       <div class="block">
@@ -440,7 +489,7 @@ input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-rad
                   <header class="app-head">
                     <div>
                       <p class="eyebrow watch-hide">Saturday, 15 November</p>
-                      <h1 class="large-title">Good morning, Pete</h1>
+                      <h1 class="large-title">Good morning, <span id="greetName">Pete</span></h1>
                     </div>
                     <div class="head-actions watch-hide">
                       <button class="icon-btn" data-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9a6 6 0 1 1 12 0c0 6.5 2.5 8 2.5 8h-17S6 15.5 6 9"/><path d="M10 21h4"/></svg></button>
@@ -925,6 +974,136 @@ $('#accent').addEventListener('input',e=>{ S.accent=e.target.value.toUpperCase()
 $('#resetBtn').addEventListener('click',()=>{ const d=S.dev; S={...DEF, dev:d}; ISS.clear(); syncControls(); apply(); });
 $('#breakAll').addEventListener('click',()=>{ ALL_ISSUES.forEach(i=>ISS.add(i)); S.accent='#FF9500'; syncControls(); apply(); });
 $('#fixAll').addEventListener('click',()=>{ ISS.clear(); S.accent=DEF.accent; syncControls(); apply(); });
+
+/* ---------- use cases ---------- */
+const UC = [
+  {id:'rosa', name:'Rosa', age:74, need:'Low vision', color:'#A6402B', dev:'phone',
+   goal:'Check in for her appointment at Harbor Clinic.',
+   steps:[
+    {t:'Opens the app', set:{}, focus:'.hero .secondary',
+     b:'Rosa has age-related macular degeneration. At the default size the visit time and clinic details are small and light gray, so she holds the phone close and still misreads the time.'},
+    {t:'Turns on Larger Text', set:{ts:8}, focus:'.hero .title2', wcag:'1.4.4',
+     b:'She drags Text Size up to AX2. Lumen supports Dynamic Type, so every label grows and the layout restacks instead of cutting words off.'},
+    {t:'Adds Bold Text and Increase Contrast', set:{bold:true, hc:true}, focus:'.hero .secondary', wcag:'1.4.3',
+     b:'Heavier strokes and darker secondary text make “10:30” and “Room 4” stand out clearly from the background.'},
+    {t:'Turns on Button Shapes', set:{shapes:true}, focus:'.hero .btn-row',
+     b:'“Reschedule” was plain blue text. Now it has a visible button shape, so she can tell what she can tap.'}
+   ],
+   outcome:'Rosa checks in by herself, without asking her grandson to read the screen.'},
+  {id:'sam', name:'Sam', age:29, need:'Dyslexia and ADHD', color:'#2E5FA8', dev:'tablet',
+   goal:'Read today’s health tips, then message his care team.',
+   steps:[
+    {t:'Opens the app on iPad', set:{}, focus:'.tips',
+     b:'The Daily tips card slides to a new tip every 4 seconds, often mid-sentence. Tightly spaced lines make Sam lose his place and start over.'},
+    {t:'Turns on Reduce Motion', set:{rm:true}, focus:'.tips', wcag:'2.2.2',
+     b:'The tips stop rotating, so Sam reads each one at his own pace. The pause button does the same for people who don’t use this setting.'},
+    {t:'Switches to a hyperlegible font', set:{legible:true}, focus:'.tips',
+     b:'Atkinson Hyperlegible gives easily confused characters, like I, l and 1, clearly different shapes, so words take less effort to decode.'},
+    {t:'Increases text spacing', set:{spacing:true}, focus:'.fine', wcag:'1.4.12',
+     b:'More space between lines, letters and words makes each line easier to follow. Lumen’s text boxes grow to fit, so nothing gets cut off.'}
+   ],
+   outcome:'Sam finishes the tips and sends his question to the care team on the first try.'},
+  {id:'dan', name:'Dan', age:41, need:'Red-green color blindness', color:'#5B3CC4', dev:'phone',
+   goal:'Turn on appointment alerts and find his new test results.',
+   steps:[
+    {t:'Sees the app his way', set:{filter:'deutan'}, focus:'.row',
+     b:'About 1 in 12 men have red-green color blindness. The preview now simulates Dan’s view: the red “New” badge and the green and orange icons blur into similar muddy shades, and switches show their state mostly through color.'},
+    {t:'Turns on On/Off Labels', set:{onoff:true}, focus:'.switch', wcag:'1.4.1',
+     b:'Switches now show I for on and O for off, so Dan can tell that appointment alerts are off without relying on color.'},
+    {t:'Turns on Button Shapes', set:{shapes:true}, focus:'.inline-link', wcag:'1.4.1',
+     b:'Links get underlines, so “Read our privacy notice” stands out from the sentence around it by more than its color.'},
+    {t:'Adds Increase Contrast', set:{hc:true}, focus:'.field, .switch', wcag:'1.4.11',
+     b:'Darker borders on cards, fields and switches make every control easier to pick out.'}
+   ],
+   outcome:'Dan turns on appointment alerts and opens his test results without second-guessing which switch is on.'}
+];
+const UC_LBL = {ts:v=>'Text size '+SIZE_NAMES[v], bold:()=>'Bold Text', hc:()=>'Increase Contrast', shapes:()=>'Button Shapes',
+  onoff:()=>'On/Off Labels', rt:()=>'Reduce Transparency', rm:()=>'Reduce Motion', legible:()=>'Hyperlegible font',
+  spacing:()=>'Text spacing', dark:v=>v?'Dark appearance':'Light appearance',
+  filter:v=>({deutan:'Deuteranopia',protan:'Protanopia',tritan:'Tritanopia',gray:'Grayscale'})[v]||'No filter'};
+let uc = null, ucStep = 0;
+const esc = t => String(t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+
+$('#ucList').innerHTML = UC.map(u=>`<button class="uc-card" role="radio" aria-checked="false" data-uc="${u.id}">
+  <span class="uc-av" style="background:${u.color}" aria-hidden="true">${u.name[0]}</span>
+  <span class="txt"><span class="t">${u.name}, ${u.age}</span><span class="d">${u.need}</span></span></button>`).join('');
+
+function greet(n){ $('#greetName').textContent = n; }
+function clearFocus(){ app.querySelectorAll('.uc-focus').forEach(x=>x.classList.remove('uc-focus')); }
+function focusPreview(sel){
+  clearFocus();
+  const els = [...app.querySelectorAll(sel)].filter(vis);
+  els.forEach(e=>e.classList.add('uc-focus'));
+  const first = els[0];
+  if(first && scroller.contains(first)){
+    const sc = +device.dataset.scale || 1;
+    const d = (first.getBoundingClientRect().top - scroller.getBoundingClientRect().top)/sc;
+    scroller.scrollBy({top:d-90, behavior: S.rm ? 'auto' : 'smooth'});
+  }
+}
+function renderUC(){
+  document.querySelectorAll('.uc-card').forEach(c=>c.setAttribute('aria-checked', c.dataset.uc===uc));
+  const panel = $('#ucPanel');
+  if(!uc){ panel.hidden = true; panel.innerHTML = ''; return; }
+  const u = UC.find(x=>x.id===uc), last = u.steps.length-1;
+  panel.hidden = false;
+  panel.innerHTML = `<p class="uc-goal"><b>${u.name}’s goal:</b> ${esc(u.goal)}</p>
+    <ol class="uc-steps">${u.steps.map((st,i)=>{
+      const cur = i===ucStep;
+      const keys = Object.keys(st.set);
+      const chips = !cur ? '' : `<span class="uc-chips">${keys.length ? keys.map(k=>`<span class="uc-chip${k==='filter'?' sim':''}">${k==='filter'?'Simulated: ':'+ '}${esc(UC_LBL[k](st.set[k]))}</span>`).join('') : '<span class="uc-chip">Default settings</span>'}${st.wcag?`<span class="uc-chip wcag">WCAG ${st.wcag}</span>`:''}</span>`;
+      return `<li class="${i<ucStep?'done':''}"><button class="uc-step" data-step="${i}" ${cur?'aria-current="step"':''}>
+        <span class="uc-num" aria-hidden="true">${i<ucStep?'✓':i+1}</span>
+        <span class="uc-st">${esc(st.t)}</span>
+        ${cur?`<span class="uc-body">${esc(st.b)}</span>`:''}${chips}</button></li>`;
+    }).join('')}</ol>
+    ${ucStep===last ? `<div class="uc-outcome"><b>Outcome</b>${esc(u.outcome)}</div>` : ''}
+    <div class="uc-nav">
+      <button class="ghost" id="ucPrev" ${ucStep===0?'disabled':''}>Back</button>
+      <span class="pos">${ucStep+1} / ${u.steps.length}</span>
+      ${ucStep<last ? '<button class="ghost uc-next" id="ucNext">Next step</button>' : '<button class="ghost" id="ucRestart">Start over</button>'}
+    </div>
+    <button class="uc-exit" id="ucExit">Exit use case</button>`;
+}
+function goStep(i){
+  const u = UC.find(x=>x.id===uc); if(!u) return;
+  ucStep = Math.max(0, Math.min(i, u.steps.length-1));
+  const prev = {...S};
+  const set = Object.assign({}, ...u.steps.slice(0, ucStep+1).map(st=>st.set));
+  S = {...DEF, dev:u.dev, accent:DEF.accent, ...set};
+  ISS.clear(); syncControls(); apply(); greet(u.name);
+  try{ history.replaceState(null,'','#'+DEVICES[S.dev].hash); }catch(e){}
+  Object.keys(DEF).forEach(k=>{
+    if(k==='dev' || prev[k]===S[k]) return;
+    const ctl = k==='dark' ? document.querySelector('[data-appearance]') : document.querySelector(`[data-k="${k}"]`);
+    const row = ctl && ctl.closest('.srow, .block');
+    if(row){ row.classList.remove('uc-changed'); void row.offsetWidth; row.classList.add('uc-changed'); }
+  });
+  renderUC();
+  const st = u.steps[ucStep];
+  $('#ucLive').textContent = `${u.name}, step ${ucStep+1} of ${u.steps.length}: ${st.t}. ${st.b}`;
+  setTimeout(()=>focusPreview(st.focus), 160);
+}
+function exitUC(restore){
+  uc = null; ucStep = 0; clearFocus(); greet('Pete'); renderUC();
+  if(restore){ S = {...DEF, dev:S.dev}; ISS.clear(); syncControls(); apply(); }
+}
+$('#ucList').addEventListener('click', e=>{
+  const c = e.target.closest('.uc-card'); if(!c) return;
+  if(uc===c.dataset.uc) return;
+  uc = c.dataset.uc; goStep(0);
+});
+$('#ucPanel').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.step!==undefined) goStep(+b.dataset.step);
+  else if(b.id==='ucNext') goStep(ucStep+1);
+  else if(b.id==='ucPrev') goStep(ucStep-1);
+  else if(b.id==='ucRestart') goStep(0);
+  else if(b.id==='ucExit') { exitUC(true); $('#ucList .uc-card')?.focus(); return; }
+  const keep = b.id ? $('#'+b.id) : null;
+  (keep || $('#ucPanel [aria-current="step"]'))?.focus();
+});
+$('#resetBtn').addEventListener('click', ()=>exitUC(false));
 
 function fromHash(){ const h=location.hash.slice(1); const d=Object.keys(DEVICES).find(k=>DEVICES[k].hash===h); if(d) setDev(d,false); }
 window.addEventListener('hashchange', fromHash);
