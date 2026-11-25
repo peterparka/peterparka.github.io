@@ -247,3 +247,5 @@ footer {
 .body-img .screen { width: 100%; border: 1px solid #E6E6E6; border-radius: 8px; padding: 0; margin: 4% 0; }
 .body-img .caption { font-size: .85em; color: #555; margin-top: -2%; }
 img { max-width: 100%; }
+.body-img.full { width: 100%; }
+.body-img.full img { padding: 3% 0; }
