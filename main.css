@@ -148,17 +148,25 @@ a:visited {
     list-style: none;
     margin: 0;
     padding: 0;
+    font-size: 14px;
+    line-height: 24px;
+    color: #6b6b6b;
+}
+
+.toc-list li {
+    display: inline;
+}
+
+.toc-list li + li::before {
+    content: "/";
+    content: "/" / "";
+    padding: 0 3px;
 }
 
 .toc-list a {
-    display: block;
-    padding: 4px 0 4px 12px;
-    border-left: 3px solid #EDEDED;
-    font-size: 13px;
-    line-height: 18px;
     color: #6b6b6b;
     text-decoration: none;
-    transition: color .2s ease, border-color .2s ease;
+    transition: color .2s ease;
 }
 
 .toc-list a:visited {
@@ -172,7 +180,10 @@ a:visited {
 .toc-list a[aria-current="true"] {
     color: black;
     font-weight: 600;
-    border-left-color: #73f7dd;
+    text-decoration: underline;
+    text-decoration-color: #73f7dd;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 4px;
 }
 
 .toc-list a:focus-visible {
@@ -517,23 +528,6 @@ footer {
         margin: 24px 0 28px;
     }
 
-    .toc-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .toc-list a {
-        border-left: 0;
-        border: 1px solid #DDDDDD;
-        border-radius: 999px;
-        padding: 6px 12px;
-    }
-
-    .toc-list a[aria-current="true"] {
-        border-color: black;
-    }
-
     .project {
         width: 100%;
         max-width: 760px;
@@ -731,6 +725,5 @@ footer {
 @media screen and (min-width: 769px) and (max-height: 820px) {
     .side p { margin-top: 70px; }
     .toc { margin-top: 18px; }
-    .toc-list a { padding-top: 2px; padding-bottom: 2px; }
     .side .quote { margin-top: 18px; }
 }
