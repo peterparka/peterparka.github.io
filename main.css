@@ -180,10 +180,6 @@ a:visited {
 .toc-list a[aria-current="true"] {
     color: black;
     font-weight: 600;
-    text-decoration: underline;
-    text-decoration-color: #73f7dd;
-    text-decoration-thickness: 3px;
-    text-underline-offset: 4px;
 }
 
 .toc-list a:focus-visible {
