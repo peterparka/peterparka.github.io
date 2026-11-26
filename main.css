@@ -150,7 +150,7 @@ a:visited {
     padding: 0;
     font-size: 14px;
     line-height: 24px;
-    color: #6b6b6b;
+    color: #DADADA;
 }
 
 .toc-list li {
@@ -164,13 +164,13 @@ a:visited {
 }
 
 .toc-list a {
-    color: #6b6b6b;
+    color: #DADADA;
     text-decoration: none;
     transition: color .2s ease;
 }
 
 .toc-list a:visited {
-    color: #6b6b6b;
+    color: #DADADA;
 }
 
 .toc-list a:hover {
