@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width"/>
+        <title>Peter An-Designer</title>
+        <link rel="stylesheet" href="case-study.css">
+        <link rel="stylesheet" href="../owl-carousel/owl.carousel.css">
+        <link rel="stylesheet" href="../owl-carousel/owl.theme.css">
+    </head>
+
+    <body>
+        <header class="head">
+            <a href="../index.html"><h5>pete rivers-an • design + product</h5></a>
+        </header>
+
+        <div class="container">
+        <div id="owl-demo" class="owl-carousel owl-theme">
+            <div class="item"><img src="accessibility-lab.png" alt="Accessibility Lab: accessibility settings on the left, a sample health app on an iPhone in the middle, and WCAG 2.2 Level A and AA gauges on the right"></div>
+        </div>
+
+            <div class="text">
+        <div class="descript">
+            <p><b>PROJECT OVERVIEW:</b> Accessibility settings like larger text, bold text and increased contrast are used by millions of people every day, but most designers rarely see their own work through those settings until something breaks in a shipped product. Accessibility Lab is an interactive tool I designed and built to close that gap. It puts a sample health app, Lumen, on an iPhone, iPad, Apple Watch and desktop browser, lets you switch iOS-style accessibility settings on and off, and shows the result instantly. Live gauges measure whether the screen meets WCAG 2.2 Level A and AA as you go, so the guidelines become something you can see, break and fix rather than a checklist at the end of a project.</p>
+            <div class="protos">
+    <p><b>TRY ME:</b> The lab is fully interactive :) Change a setting, break the app, or follow one of the use cases. *The app and its data are samples.</p>
+    <ul>
+        <li><a href="index.html#iphone" target="_blank" rel="noopener">Open Accessibility Lab &rarr; iPhone</a></li>
+        <li><a href="index.html#ipad" target="_blank" rel="noopener">Open Accessibility Lab &rarr; iPad</a></li>
+        <li><a href="index.html#watch" target="_blank" rel="noopener">Open Accessibility Lab &rarr; Apple Watch</a></li>
+    </ul>
+</div>
+        </div>
+        <div class="info">
+        <p><span>Project Name : Accessibility Lab</span></p>
+             <p><span>Type : Accessibility &amp; Interaction Design</span></p>
+             <p><span>Tools Used : HTML, CSS, JavaScript, WCAG 2.2, Claude</span></p>
+            </div>
+        </div>
+
+<section>
+
+<div>
+    <h2>Problem</h2>
+    <p>Accessibility usually arrives late in the process, and in a form that's hard to act on:</p>
+        <div>
+        <ul>• WCAG is written as abstract success criteria, like "1.4.3 Contrast (Minimum)", so it's hard to tell what a guideline actually means for the screen in front of you.</ul>
+        <ul>• Designs are reviewed at default settings. Few teams check what a layout does at the largest text size, with Bold Text on, or in dark mode with Increase Contrast, which is exactly where cut-off text, overlapping elements and low contrast hide.</ul>
+        <ul>• Audits tend to happen at the end, one tool and one rule at a time. Teams get a list of violations instead of an understanding of what caused them.</ul>
+        <ul>• The same product ships on phone, tablet, watch and web, each with different constraints, but accessibility is often tested on only one of them.</ul>
+        </div>
+</div>
+<div>
+    <h2>Observations</h2>
+    <p>The hardest part of accessibility isn't knowing the rules, it's connecting a rule to a cause and a person. A failed contrast check means little until you see the gray text it refers to, and see who can't read it. So rather than building another checker, I organized the experience around three questions:</p>
+
+<ul>• See it — What does this setting actually do to the interface?</ul>
+<ul>• Break it — Which common design decision causes this failure?</ul>
+<ul>• Check it — Does this screen meet Level A and AA right now?</ul>
+
+    <p>These became the three parts of the layout: accessibility settings on the left, a live device preview in the middle, and the WCAG gauges and checks on the right, all updating together.</p>
+</div>
+<div class="body-img full">
+<img class="wide" src="ex-devices.png" alt="The Lumen app on a desktop browser, iPad, iPhone and Apple Watch, side by side">
+</div>
+
+<div>
+    <h2>Tasks & Actions</h2>
+
+        <h4>01. Put one real app on four devices</h4>
+
+<p>Accessibility problems look different on every screen, so the preview isn't a static mockup. Lumen is a small, working health app built to adapt like a real product: a sidebar on iPad and desktop, a tab bar on iPhone, and a focused set of cards on Apple Watch. Switching devices keeps every setting in place, which makes it easy to see that a layout can pass on iPad and fail on iPhone.</p>
+
+<div class="body-img full">
+<img class="wide" src="ex-devices-dark.png" alt="The same four devices in dark mode: settings carry across every device">
+</div>
+
+        <h4>02. Mirror real system settings and apply them instantly</h4>
+
+<p>The settings use the same names and behavior people know from iOS: Text Size from xSmall to AX5 using Apple's Dynamic Type sizes, Bold Text, Increase Contrast, Button Shapes, On/Off Labels, Reduce Transparency, Smart Invert, color filters and Reduce Motion. I added two reading aids, WCAG text spacing and a hyperlegible font. Every change lands on the device immediately, and at the largest text sizes the layout simplifies to a single column, the way well-built iOS apps do, instead of cutting words off.</p>
+
+<div class="body-img">
+<img class="phones" src="ex-rosa.png" alt="Before and after: the iPhone at default settings, then with larger text, Bold Text, Increase Contrast and Button Shapes on">
+</div>
+
+        <h4>03. Measure the screen, don't guess</h4>
+
+<p>The gauges aren't a checklist of which switches are on. They're driven by 12 checks that run on the live preview every time something changes: the contrast of every piece of text, the size of every tap target, whether the content scrolls sideways at the current width, and whether every image and control has a name a screen reader can announce. Two stress tests run invisibly in the background, enlarging text to 200% and applying the WCAG spacing values, to catch text that would get cut off. Each check shows its measured value, and selecting a failing check outlines the exact elements causing it in the preview.</p>
+
+<div class="body-img">
+<img class="screen" src="ex-checks.png" alt="The app with design mistakes turned on: the gauges failing, and the low-contrast text outlined in the preview after selecting the Contrast check">
+</div>
+
+        <h4>04. Make failure something you can learn from</h4>
+
+<p>"Break the app" adds 12 common design mistakes, each tied to one WCAG criterion: gray text that's too light, links shown by color alone, images without alt text, icon buttons without labels, fixed-height text boxes, tiny tap targets and more. A brand color picker shows how close familiar colors come to the line. For example, iOS system blue on white measures 4.0:1, just under the 4.5:1 that body text needs. Mistakes only fail where they actually cause harm, so a fixed-width layout fails on iPhone but passes on iPad, which mirrors how these bugs slip through review in real projects.</p>
+
+        <h4>05. Tell the story through people, not rules</h4>
+
+<p>Three use cases walk through the app with a specific person: Rosa, 74, with low vision; Sam, 29, with dyslexia and ADHD; and Dan, 41, with red-green color blindness. Each one has a goal, like checking in for an appointment, and a short series of steps. Every step turns on a setting they rely on, highlights the part of the screen it affects, and names the WCAG criterion behind it. For Dan, the preview first simulates his color vision, then shows how On/Off Labels and underlined links let him tell switch states and links apart without relying on color.</p>
+
+<div class="body-img">
+<img class="phones" src="ex-dan.png" alt="Dan's use case: the iPhone with a deuteranopia simulation, then with On/Off Labels showing I and O on the switches">
+</div>
+
+        <h4>06. Let people hear the interface, too</h4>
+
+<p>A caption under the device shows what VoiceOver would announce for whatever you hover over or tab to, such as "Check in, button" or "Medication reminders, switch button, on". When a mistake removes a label, the caption flags the unlabeled control, so missing names become something you notice in the moment rather than a line in an audit report.</p>
+
+</div>
+
+
+<div class="bottom">
+    <h2>Outcome</h2>
+    <p>Accessibility Lab turns WCAG from a list of rules into cause and effect. You change a setting or introduce a mistake, and immediately see what happens to the interface, which person it affects, and which criterion it breaks, on every device the product ships to. Because the checks measure the live screen, the gauges stay honest as you experiment. The lab is also clear about its limits: automated checks cover the 12 criteria a tool can measure, and full conformance still needs manual review, such as keyboard testing and testing with a real screen reader. That makes it a practical starting point for design reviews and for teaching teams why accessibility decisions matter.</p>
+</div>
+</section>
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="../owl-carousel/owl.carousel.js"></script>
+    <script>
+    $(document).ready(function() {
+      $("#owl-demo").owlCarousel({
+          navigation : true,
+          slideSpeed : 300,
+          paginationSpeed : 400,
+          singleItem:true
+      });
+    });
+    </script>
+    </body>
+</html>
