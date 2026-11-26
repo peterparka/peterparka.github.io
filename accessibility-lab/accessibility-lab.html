@@ -17,25 +17,25 @@
 
         <div class="container">
         <div id="owl-demo" class="owl-carousel owl-theme">
-            <div class="item"><img src="accessibility-lab.png" alt="Accessibility Lab: accessibility settings on the left, a sample health app on an iPhone in the middle, and WCAG 2.2 Level A and AA gauges on the right"></div>
+            <div class="item"><img src="accessibility-lab.png" alt="Accessibility for Workspace: accessibility settings on the left, a sample workspace app on an iPhone in the middle, and WCAG 2.2 Level A and AA gauges on the right"></div>
         </div>
 
             <div class="text">
         <div class="descript">
-            <p><b>PROJECT OVERVIEW:</b> Accessibility settings like larger text, bold text and increased contrast are used by millions of people every day, but most designers rarely see their own work through those settings until something breaks in a shipped product. Accessibility Lab is an interactive tool I designed and built to close that gap. It puts a sample health app, Lumen, on an iPhone, iPad, Apple Watch and desktop browser, lets you switch iOS-style accessibility settings on and off, and shows the result instantly. Live gauges measure whether the screen meets WCAG 2.2 Level A and AA as you go, so the guidelines become something you can see, break and fix rather than a checklist at the end of a project.</p>
+            <p><b>PROJECT OVERVIEW:</b> Accessibility settings like larger text, bold text and increased contrast are used by millions of people every day, but most designers rarely see their own work through those settings until something breaks in a shipped product. Accessibility for Workspace is an interactive tool I designed and built to close that gap, using Material Design 3 as its design system. It puts a sample workspace app, Lumen, on an iPhone, iPad, Apple Watch and desktop browser, lets you switch iOS-style accessibility settings on and off, and shows the result instantly. Live gauges measure whether the screen meets WCAG 2.2 Level A and AA as you go, so the guidelines become something you can see, break and fix rather than a checklist at the end of a project.</p>
             <div class="protos">
     <p><b>TRY ME:</b> The lab is fully interactive :) Change a setting, break the app, or follow one of the use cases. *The app and its data are samples.</p>
     <ul>
-        <li><a href="index.html#iphone" target="_blank" rel="noopener">Open Accessibility Lab &rarr; iPhone</a></li>
-        <li><a href="index.html#ipad" target="_blank" rel="noopener">Open Accessibility Lab &rarr; iPad</a></li>
-        <li><a href="index.html#watch" target="_blank" rel="noopener">Open Accessibility Lab &rarr; Apple Watch</a></li>
+        <li><a href="index.html#iphone" target="_blank" rel="noopener">Open Accessibility for Workspace &rarr; iPhone</a></li>
+        <li><a href="index.html#ipad" target="_blank" rel="noopener">Open Accessibility for Workspace &rarr; iPad</a></li>
+        <li><a href="index.html#watch" target="_blank" rel="noopener">Open Accessibility for Workspace &rarr; Apple Watch</a></li>
     </ul>
 </div>
         </div>
         <div class="info">
-        <p><span>Project Name : Accessibility Lab</span></p>
+        <p><span>Project Name : Accessibility for Workspace</span></p>
              <p><span>Type : Accessibility &amp; Interaction Design</span></p>
-             <p><span>Tools Used : HTML, CSS, JavaScript, WCAG 2.2, Claude</span></p>
+             <p><span>Tools Used : Material Design 3, HTML, CSS, JavaScript, WCAG 2.2, Claude</span></p>
             </div>
         </div>
 
@@ -62,7 +62,7 @@
     <p>These became the three parts of the layout: accessibility settings on the left, a live device preview in the middle, and the WCAG gauges and checks on the right, all updating together.</p>
 </div>
 <div class="body-img full">
-<img class="wide" src="ex-devices.png" alt="The Lumen app on a desktop browser, iPad, iPhone and Apple Watch, side by side">
+<img class="wide" src="ex-devices.png" alt="The sample workspace app on a desktop browser, iPad, iPhone and Apple Watch, side by side">
 </div>
 
 <div>
@@ -70,7 +70,7 @@
 
         <h4>01. Put one real app on four devices</h4>
 
-<p>Accessibility problems look different on every screen, so the preview isn't a static mockup. Lumen is a small, working health app built to adapt like a real product: a sidebar on iPad and desktop, a tab bar on iPhone, and a focused set of cards on Apple Watch. Switching devices keeps every setting in place, which makes it easy to see that a layout can pass on iPad and fail on iPhone.</p>
+<p>Accessibility problems look different on every screen, so the preview isn't a static mockup. Lumen is a small, working workspace app, with meetings, focus tips, team chat and shared files, built to adapt like a real product: a sidebar on iPad and desktop, a tab bar on iPhone, and a focused set of cards on Apple Watch. Switching devices keeps every setting in place, which makes it easy to see that a layout can pass on iPad and fail on iPhone.</p>
 
 <div class="body-img full">
 <img class="wide" src="ex-devices-dark.png" alt="The same four devices in dark mode: settings carry across every device">
@@ -98,22 +98,26 @@
 
         <h4>05. Tell the story through people, not rules</h4>
 
-<p>Three use cases walk through the app with a specific person: Rosa, 74, with low vision; Sam, 29, with dyslexia and ADHD; and Dan, 41, with red-green color blindness. Each one has a goal, like checking in for an appointment, and a short series of steps. Every step turns on a setting they rely on, highlights the part of the screen it affects, and names the WCAG criterion behind it. For Dan, the preview first simulates his color vision, then shows how On/Off Labels and underlined links let him tell switch states and links apart without relying on color.</p>
+<p>Three use cases walk through the app with a specific person: Rosa, 67, with low vision; Sam, 29, with dyslexia and ADHD; and Dan, 41, with red-green color blindness. Each one has a goal, like joining a meeting, and a short series of steps. Every step turns on a setting they rely on, highlights the part of the screen it affects, and names the WCAG criterion behind it. For Dan, the preview first simulates his color vision, then shows how On/Off Labels and underlined links let him tell switch states and links apart without relying on color.</p>
 
 <div class="body-img">
 <img class="phones" src="ex-dan.png" alt="Dan's use case: the iPhone with a deuteranopia simulation, then with On/Off Labels showing I and O on the switches">
 </div>
 
-        <h4>06. Let people hear the interface, too</h4>
+        <h4>06. Build it on a real design system</h4>
 
-<p>A caption under the device shows what VoiceOver would announce for whatever you hover over or tab to, such as "Check in, button" or "Medication reminders, switch button, on". When a mistake removes a label, the caption flags the unlabeled control, so missing names become something you notice in the moment rather than a line in an audit report.</p>
+<p>Accessibility holds up best when it lives in the design system rather than in individual screens, so I built both the lab and the sample app on Material Design 3. Color comes from Material's color roles, such as primary, surface and on-surface, chosen so text and controls pass AA in light and dark themes. The type scale, the pill-shaped buttons, the segmented buttons and the switches all follow Material's specs, which meant contrast, target size and focus states only had to be solved once and then held everywhere. Material's switch also shows its state through the thumb's size and position, not only color, which supports the same goal as On/Off Labels.</p>
+
+        <h4>07. Let people hear the interface, too</h4>
+
+<p>A caption under the device shows what VoiceOver would announce for whatever you hover over or tab to, such as "Join, button" or "Meeting reminders, switch button, on". When a mistake removes a label, the caption flags the unlabeled control, so missing names become something you notice in the moment rather than a line in an audit report.</p>
 
 </div>
 
 
 <div class="bottom">
     <h2>Outcome</h2>
-    <p>Accessibility Lab turns WCAG from a list of rules into cause and effect. You change a setting or introduce a mistake, and immediately see what happens to the interface, which person it affects, and which criterion it breaks, on every device the product ships to. Because the checks measure the live screen, the gauges stay honest as you experiment. The lab is also clear about its limits: automated checks cover the 12 criteria a tool can measure, and full conformance still needs manual review, such as keyboard testing and testing with a real screen reader. That makes it a practical starting point for design reviews and for teaching teams why accessibility decisions matter.</p>
+    <p>Accessibility for Workspace turns WCAG from a list of rules into cause and effect. You change a setting or introduce a mistake, and immediately see what happens to the interface, which person it affects, and which criterion it breaks, on every device the product ships to. Because the checks measure the live screen, the gauges stay honest as you experiment. The lab is also clear about its limits: automated checks cover the 12 criteria a tool can measure, and full conformance still needs manual review, such as keyboard testing and testing with a real screen reader. That makes it a practical starting point for design reviews and for teaching teams why accessibility decisions matter.</p>
 </div>
 </section>
 
